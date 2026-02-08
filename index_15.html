@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CastMatch Pro v3.4 — AI Casting Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #08080d;
+            --surface: #101018;
+            --surface-2: #181824;
+            --surface-3: #20202e;
+            --border: #262640;
+            --border-light: #363655;
+            --text: #eaeaf4;
+            --text-dim: #8a8ab0;
+            --text-muted: #55556e;
+            --accent: #7c5cfc;
+            --accent-light: #a088ff;
+            --accent-glow: rgba(124, 92, 252, 0.12);
+            --green: #34d399;
+            --green-dim: rgba(52, 211, 153, 0.10);
+            --red: #f87171;
+            --red-dim: rgba(248, 113, 113, 0.10);
+            --amber: #fbbf24;
+            --amber-dim: rgba(251, 191, 36, 0.10);
+            --blue: #60a5fa;
+            --blue-dim: rgba(96, 165, 250, 0.10);
+            --pink: #f472b6;
+            --pink-dim: rgba(244, 114, 182, 0.10);
+            --cyan: #22d3ee;
+            --cyan-dim: rgba(34, 211, 238, 0.10);
+            --radius: 10px;
+            --radius-lg: 14px;
+            --font: 'DM Sans', -apple-system, sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+            --shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .app { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        /* ── Header ── */
+        .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), #c084fc); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 20px var(--accent-glow); }
+        .logo h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+        .logo span { font-size: 11px; color: var(--text-dim); font-family: var(--mono); letter-spacing: 1px; text-transform: uppercase; }
+        .header-right { display: flex; gap: 8px; align-items: center; }
+        .api-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-dim); padding: 6px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; cursor: pointer; }
+        .api-pill:hover { border-color: var(--accent); }
+        .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+        .dot.on { background: var(--green); box-shadow: 0 0 6px rgba(52,211,153,0.5); }
+
+        /* ── Tabs ── */
+        .tabs { display: flex; gap: 3px; background: var(--surface); padding: 3px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border); overflow-x: auto; }
+        .tab { padding: 10px 16px; background: transparent; border: none; color: var(--text-muted); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 7px; transition: all 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+        .tab:hover { color: var(--text-dim); background: var(--surface-2); }
+        .tab.active { background: var(--accent); color: white; }
+        .tab .badge { background: rgba(255,255,255,0.2); padding: 1px 7px; border-radius: 20px; font-size: 10px; font-weight: 700; font-family: var(--mono); }
+
+        /* ── Cards ── */
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 14px; }
+        .card-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .card-title .ic { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+
+        /* ── Form ── */
+        .fg { display: flex; flex-direction: column; gap: 5px; }
+        .fl { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.7px; font-family: var(--mono); }
+        .fi, .fs, .ft { padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; color: var(--text); font-family: var(--font); font-size: 13px; transition: border 0.2s; outline: none; width: 100%; }
+        .fi:focus, .fs:focus, .ft:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+        .fi::placeholder, .ft::placeholder { color: var(--text-muted); }
+        .ft { resize: vertical; min-height: 70px; }
+        .fs option { background: var(--surface-2); }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        .form-full { grid-column: 1 / -1; }
+
+        /* ── Buttons ── */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 16px; border-radius: 7px; border: 1px solid transparent; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+        .btn-p { background: var(--accent); color: white; box-shadow: 0 2px 10px var(--accent-glow); }
+        .btn-p:hover { background: var(--accent-light); transform: translateY(-1px); }
+        .btn-p:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+        .btn-g { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+        .btn-g:hover { color: var(--text); border-color: var(--border-light); }
+        .btn-d { background: transparent; color: var(--text-muted); border: 1px solid transparent; }
+        .btn-d:hover { color: var(--red); background: var(--red-dim); }
+        .btn-s { padding: 6px 12px; font-size: 12px; }
+        .btn-l { padding: 12px 24px; font-size: 14px; }
+
+        /* ── Pipeline ── */
+        .pipeline { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 20px; }
+        .pipeline-col { min-width: 220px; flex: 1; }
+        .pipeline-header { padding: 10px 14px; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 700; font-family: var(--mono); text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+        .pipeline-body { background: var(--surface); border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; min-height: 80px; padding: 8px; }
+        .pipeline-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; transition: all 0.15s; font-size: 13px; }
+        .pipeline-card:hover { border-color: var(--accent); }
+        .pipeline-card .name { font-weight: 600; }
+        .pipeline-card .meta { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+        .ph-intake { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
+        .ph-screen { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+        .ph-interview { background: var(--pink-dim); color: var(--pink); border: 1px solid rgba(244,114,182,0.2); }
+        .ph-shortlist { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(34,211,238,0.2); }
+        .ph-pitched { background: var(--accent-glow); color: var(--accent-light); border: 1px solid rgba(124,92,252,0.2); }
+        .ph-cast { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+
+        /* ── Show Types ── */
+        .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+        .chip { padding: 6px 14px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; color: var(--text-dim); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+        .chip:hover { border-color: var(--accent); color: var(--text); }
+        .chip.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent-light); }
+
+        /* ── Kandidaat Grid ── */
+        .k-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+        .k-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; transition: all 0.15s; position: relative; }
+        .k-card:hover { border-color: var(--border-light); }
+        .k-card.sel { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
+        .k-name { font-size: 15px; font-weight: 600; }
+        .k-meta { font-size: 11px; color: var(--text-dim); font-family: var(--mono); margin-top: 2px; }
+        .k-desc { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin: 10px 0; }
+        .k-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+        .tag { padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; font-family: var(--mono); }
+        .tag-a { background: var(--accent-glow); color: var(--accent-light); }
+        .tag-g { background: var(--green-dim); color: var(--green); }
+        .tag-b { background: var(--blue-dim); color: var(--blue); }
+        .tag-r { background: var(--red-dim); color: var(--red); }
+        .tag-p { background: var(--pink-dim); color: var(--pink); }
+        .k-actions { display: flex; gap: 4px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+        .k-check { position: absolute; top: 12px; right: 12px; width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; transition: all 0.15s; }
+        .k-check:hover { border-color: var(--accent); }
+        .k-check.on { background: var(--accent); border-color: var(--accent); color: white; }
+
+        /* ── Pipeline Stage Selector ── */
+        .stage-sel { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 8px; }
+        .stage-btn { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-family: var(--mono); border: 1px solid var(--border); background: transparent; color: var(--text-dim); cursor: pointer; }
+        .stage-btn:hover { border-color: var(--accent); }
+        .stage-btn.current { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* ── Stats ── */
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; text-align: center; }
+        .stat-v { font-size: 26px; font-weight: 700; font-family: var(--mono); }
+        .stat-l { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; font-family: var(--mono); }
+
+        /* ── Diversity Bars ── */
+        .div-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .div-label { font-size: 12px; color: var(--text-dim); width: 100px; flex-shrink: 0; }
+        .div-bar-bg { flex: 1; height: 20px; background: var(--surface-2); border-radius: 4px; overflow: hidden; display: flex; }
+        .div-seg { height: 100%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; font-family: var(--mono); color: rgba(255,255,255,0.8); overflow: hidden; }
+
+        /* ── Matrix ── */
+        .matrix-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .matrix-table th, .matrix-table td { padding: 8px; text-align: center; border: 1px solid var(--border); }
+        .matrix-table th { background: var(--surface-2); font-weight: 600; font-size: 11px; position: sticky; top: 0; }
+        .matrix-table td { font-family: var(--mono); font-size: 11px; }
+        .mx-high { background: var(--red-dim); color: var(--red); font-weight: 700; }
+        .mx-med { background: var(--amber-dim); color: var(--amber); }
+        .mx-low { background: var(--green-dim); color: var(--green); }
+        .mx-self { background: var(--surface-3); color: var(--text-muted); }
+
+        /* ── Analyse Result ── */
+        .result-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; font-size: 13px; line-height: 1.7; white-space: pre-wrap; }
+        .result-box h3 { color: var(--accent-light); margin: 18px 0 8px; font-size: 15px; }
+        .result-box h3:first-child { margin-top: 0; }
+        .result-box strong { color: var(--text); }
+
+        /* ── Loading ── */
+        .ld { display: flex; align-items: center; gap: 10px; padding: 16px; color: var(--text-dim); font-size: 13px; }
+        .sp { width: 18px; height: 18px; border: 2px solid var(--border); border-top: 2px solid var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Empty ── */
+        .empty { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+        .empty .ei { font-size: 36px; margin-bottom: 12px; opacity: 0.4; }
+        .empty p { font-size: 13px; max-width: 340px; margin: 0 auto; }
+
+        /* ── Modal ── */
+        .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+        .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 100%; max-width: 600px; max-height: 85vh; overflow-y: auto; padding: 24px; }
+        .modal h2 { font-size: 17px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+        /* ── Comparison ── */
+        .comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .comp-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+        .comp-card h3 { font-size: 15px; margin-bottom: 8px; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .app { padding: 12px; }
+            .header { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .form-row { grid-template-columns: 1fr; }
+            .k-grid { grid-template-columns: 1fr; }
+            .pipeline { flex-direction: column; }
+            .pipeline-col { min-width: unset; }
+            .comp-grid { grid-template-columns: 1fr; }
+        }
+
+        .fade { animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── Tab content ── */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── Personality Radar (CSS) ── */
+        .big5-bars { display: flex; flex-direction: column; gap: 6px; }
+        .b5-row { display: flex; align-items: center; gap: 8px; }
+        .b5-label { font-size: 11px; font-family: var(--mono); color: var(--text-dim); width: 100px; flex-shrink: 0; }
+        .b5-track { flex: 1; height: 16px; background: var(--surface-3); border-radius: 3px; overflow: hidden; }
+        .b5-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; display: flex; align-items: center; padding-left: 6px; font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.9); font-family: var(--mono); }
+        .b5-val { font-size: 11px; font-family: var(--mono); color: var(--text-dim); width: 30px; text-align: right; }
+
+        /* ── v3 Additions ── */
+        .filter-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+        .filter-bar .fi { max-width: 250px; padding: 7px 10px; font-size: 12px; }
+        .filter-bar .fs { max-width: 150px; padding: 7px 10px; font-size: 12px; }
+        .pipeline-body.drag-over { background: var(--accent-glow); border-color: var(--accent); }
+        .pipeline-card { cursor: grab; }
+        .pipeline-card.dragging { opacity: 0.4; }
+        .pipeline-card .name { display: flex; align-items: center; gap: 6px; }
+        .pipeline-card .name img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+        .pipeline-card .sc-pill { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-family: var(--mono); font-weight: 700; margin-top: 4px; }
+        .k-name { display: flex; align-items: center; gap: 8px; }
+        .k-name img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+        .progress-wrap { width: 100%; background: var(--surface-3); border-radius: 4px; overflow: hidden; height: 8px; margin: 8px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); transition: width 0.3s; border-radius: 4px; }
+        .dna-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+        .dna-slot { background: var(--surface-3); border: 1px solid var(--border); border-radius: 7px; padding: 10px; text-align: center; font-size: 11px; }
+        .dna-slot .emoji { font-size: 20px; margin-bottom: 4px; }
+        .dna-slot .count { font-family: var(--mono); font-weight: 700; font-size: 16px; color: var(--accent-light); }
+        .dna-slot .label { color: var(--text-dim); margin-top: 2px; }
+        .dna-slot.filled { border-color: var(--green); }
+        .dna-slot.missing { border-color: var(--red); border-style: dashed; }
+        .chat-wrap { display: flex; flex-direction: column; height: 500px; background: var(--surface-2); border-top: 1px solid var(--border); overflow: hidden; }
+        .chat-msgs { flex: 1; overflow-y: auto; padding: 16px; }
+        .chat-msg { margin-bottom: 12px; max-width: 85%; }
+        .chat-msg.user { margin-left: auto; }
+        .chat-msg .bubble { padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+        .chat-msg.user .bubble { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
+        .chat-msg.ai .bubble { background: var(--surface-3); color: var(--text); border-bottom-left-radius: 4px; }
+        .chat-input { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border); }
+        .chat-input input { flex: 1; }
+        .eq-q { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; }
+        .eq-q h4 { font-size: 13px; margin-bottom: 10px; }
+        .eq-opts { display: flex; gap: 6px; flex-wrap: wrap; }
+        .eq-opt { padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 12px; cursor: pointer; background: transparent; color: var(--text-dim); transition: all 0.15s; font-family: var(--font); }
+        .eq-opt:hover { border-color: var(--accent); color: var(--text); }
+        .eq-opt.selected { background: var(--accent); border-color: var(--accent); color: white; }
+        .note-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+        .note-item:last-child { border-bottom: none; }
+        .note-ava { width: 24px; height: 24px; border-radius: 50%; background: var(--accent-glow); display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+        .score-ring { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; font-family: var(--mono); border: 3px solid; flex-shrink: 0; }
+        .score-ring.high { border-color: var(--green); color: var(--green); }
+        .score-ring.mid { border-color: var(--amber); color: var(--amber); }
+        .score-ring.low { border-color: var(--red); color: var(--red); }
+        .proj-sel { padding: 6px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; color: var(--text-dim); font-family: var(--font); font-size: 12px; cursor: pointer; outline: none; }
+        .proj-sel option { background: var(--surface); }
+        @media (max-width: 768px) { .filter-bar { flex-direction: column; } .filter-bar .fi, .filter-bar .fs { max-width: 100%; } }
+
+        /* ── Light Mode ── */
+        body.light { --bg: #f5f5f7; --surface: #ffffff; --surface-2: #f0f0f5; --surface-3: #e8e8f0; --border: #d4d4e0; --border-light: #c0c0d0; --text: #1a1a2e; --text-dim: #555570; --text-muted: #888898; }
+        body.light .pipeline-card, body.light .k-card { box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        body.light .result-box { border-color: #d4d4e0; }
+
+        /* ── Toast ── */
+        .toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;color:white;z-index:2000;animation:toastIn 0.3s ease,toastOut 0.3s ease 2.7s forwards;pointer-events:none;}
+        .rpt-check{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);cursor:pointer;padding:5px 0;margin:0;}
+        .rpt-check input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+        .rpt-check span{line-height:1.3;}
+        .toast-ok{background:var(--green)}.toast-err{background:var(--red)}.toast-warn{background:var(--amber);color:#222}
+        @keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes toastOut{from{opacity:1}to{opacity:0}}
+
+        /* ── Visuele Vergelijk ── */
+        .vcomp-grid{display:grid;gap:14px;margin-top:14px}
+        .vcomp-grid.c2{grid-template-columns:1fr 1fr}
+        .vcomp-grid.c3{grid-template-columns:1fr 1fr 1fr}
+        .vcomp-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+        .vcomp-card .vname{font-size:15px;font-weight:700;margin-bottom:8px}
+        .vcomp-card img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--border);margin-bottom:8px}
+        @media(max-width:768px){.vcomp-grid.c2,.vcomp-grid.c3{grid-template-columns:1fr}}
+
+        /* ── Keyboard hint ── */
+        .kb-hint{position:fixed;bottom:24px;left:24px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--text-dim);z-index:900;display:none}
+        .kb-hint kbd{background:var(--surface-3);padding:1px 6px;border-radius:3px;font-family:var(--mono);border:1px solid var(--border)}
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">🎬</div>
+            <div>
+                <h1>CastMatch Pro</h1>
+                <span>AI Casting Intelligence v3</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <select class="proj-sel" id="projectSel" onchange="switchProject()"></select>
+            <button class="btn btn-g btn-s" onclick="manageProjects()">📁</button>
+            <button class="btn btn-g btn-s" onclick="toggleTheme()" title="Dark/Light mode" id="themeBtn">🌙</button>
+            <button class="btn btn-g btn-s" onclick="showFAQ()" title="Help & FAQ">❓</button>
+            <button class="btn btn-s" onclick="showTab('rapport')" title="Rapport genereren" style="background:var(--accent);color:#fff;font-weight:600;">📄 Rapport</button>
+            <div class="api-pill" onclick="showTab('settings')">
+                <div class="dot" id="apiDot"></div>
+                <span id="apiLabel">Niet verbonden</span>
+            </div>
+            <div id="storageWarn" style="display:none;font-size:10px;color:var(--amber);font-family:var(--mono)"></div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="mainTabs">
+        <button class="tab active" data-t="pipeline" onclick="showTab('pipeline')">📊 Pipeline <span class="badge" id="bTotal">0</span></button>
+        <button class="tab" data-t="kandidaten" onclick="showTab('kandidaten')">👥 Kandidaten</button>
+        <button class="tab" data-t="analyse" onclick="showTab('analyse')">🤖 AI Analyse</button>
+        <button class="tab" data-t="matrix" onclick="showTab('matrix')">🔗 Relatie Matrix</button>
+        <button class="tab" data-t="diversiteit" onclick="showTab('diversiteit')">📊 Diversiteit</button>
+        <button class="tab" data-t="vergelijk" onclick="showTab('vergelijk')">⚖️ Vergelijk</button>
+        <button class="tab" data-t="scenario" onclick="showTab('scenario')">🎭 Scenario</button>
+        <button class="tab" data-t="showdna" onclick="showTab('showdna')">🧬 DNA</button>
+        <button class="tab" data-t="eqtest" onclick="showTab('eqtest')">🧠 EQ Test</button>
+        <button class="tab" data-t="chat" onclick="showTab('chat')">💬 Chat</button>
+        <button class="tab" data-t="settings" onclick="showTab('settings')">⚙️</button>
+    </div>
+
+    <!-- ══════ PIPELINE ══════ -->
+    <div class="tab-content active" id="tc-pipeline">
+        <div class="card" style="margin-bottom:14px;">
+            <div class="card-title"><span class="ic" style="background:var(--blue-dim);">📺</span> Programma</div>
+            <div class="chips" id="showChips"></div>
+        </div>
+        <div class="stats">
+            <div class="stat"><div class="stat-v" id="sTotal">0</div><div class="stat-l">Totaal</div></div>
+            <div class="stat"><div class="stat-v" id="sIntake">0</div><div class="stat-l">Intake</div></div>
+            <div class="stat"><div class="stat-v" id="sScreen">0</div><div class="stat-l">Screening</div></div>
+            <div class="stat"><div class="stat-v" id="sInterview">0</div><div class="stat-l">Interview</div></div>
+            <div class="stat"><div class="stat-v" id="sShortlist">0</div><div class="stat-l">Shortlist</div></div>
+            <div class="stat"><div class="stat-v" id="sPitched">0</div><div class="stat-l">Pitched</div></div>
+            <div class="stat"><div class="stat-v" id="sCast">0</div><div class="stat-l">Gecast</div></div>
+        </div>
+        <div class="pipeline" id="pipelineView"></div>
+    </div>
+
+    <!-- ══════ KANDIDATEN ══════ -->
+    <div class="tab-content" id="tc-kandidaten">
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--green-dim);">➕</span> Nieuwe Kandidaat</div>
+            <!-- Sectie 1: Basis info -->
+            <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-family:var(--mono)">Basis Info</div>
+            <div class="form-row">
+                <div class="fg"><label class="fl">Naam *</label><input class="fi" id="fNaam" placeholder="Volledige naam"></div>
+                <div class="fg"><label class="fl">Leeftijd</label><input class="fi" id="fLeeftijd" type="number" placeholder="34"></div>
+                <div class="fg"><label class="fl">Beroep</label><input class="fi" id="fBeroep" placeholder="Advocaat"></div>
+                <div class="fg"><label class="fl">Gender</label>
+                    <select class="fs" id="fGender"><option value="">—</option><option>Man</option><option>Vrouw</option><option>Non-binair</option><option>Anders</option></select>
+                </div>
+                <div class="fg"><label class="fl">Achtergrond</label><input class="fi" id="fAchtergrond" placeholder="Culturele achtergrond"></div>
+                <div class="fg"><label class="fl">Archetype</label>
+                    <select class="fs" id="fArchetype">
+                        <option value="">— Kies —</option>
+                        <option value="🎯 Strategist">🎯 Strategist</option>
+                        <option value="🤝 Loyalist">🤝 Loyalist</option>
+                        <option value="⚡ Rebel">⚡ Rebel</option>
+                        <option value="👑 Leider">👑 Leider</option>
+                        <option value="👁️ Observer">👁️ Observer</option>
+                        <option value="✨ Socialite">✨ Socialite</option>
+                        <option value="🎭 Acteur">🎭 Acteur</option>
+                        <option value="❤️ Empaat">❤️ Empaat</option>
+                        <option value="🔥 Provocateur">🔥 Provocateur</option>
+                    </select>
+                </div>
+            </div>
+            <!-- Sectie 2: Online & Media -->
+            <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;font-family:var(--mono)">Online & Media</div>
+            <div class="form-row">
+                <div class="fg"><label class="fl">Instagram</label><input class="fi" id="fInsta" placeholder="@handle"></div>
+                <div class="fg"><label class="fl">TikTok</label><input class="fi" id="fTiktok" placeholder="@handle"></div>
+                <div class="fg"><label class="fl">Video Link</label><input class="fi" id="fVideo" placeholder="YouTube/Vimeo audition"></div>
+                <div class="fg"><label class="fl">Foto</label><input type="file" id="fFoto" accept="image/*" style="font-size:12px;color:var(--text-dim)" onchange="previewFoto(this)"><input class="fi" id="fFotoUrl" placeholder="Of plak foto URL..." style="margin-top:4px;font-size:11px" onchange="previewFotoUrl(this.value)"><div id="fotoPreview" style="margin-top:4px"></div></div>
+            </div>
+            <!-- Sectie 3: Beschrijving -->
+            <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;font-family:var(--mono)">Beschrijving</div>
+            <div class="fg" style="margin-bottom:10px"><label class="fl">Persoonlijkheid & Achtergrond *</label><textarea class="ft" id="fDesc" placeholder="Beschrijf persoonlijkheid, motivatie, sterke/zwakke punten..."></textarea></div>
+            <div class="fg"><label class="fl">Team Notities (intern)</label><textarea class="ft" id="fNotes" placeholder="Interne opmerkingen voor het casting team..." style="min-height:50px;"></textarea></div>
+            <div style="display:flex; gap:8px; margin-top:14px;">
+                <button class="btn btn-p" onclick="addK()">➕ Toevoegen</button>
+                <button class="btn btn-g" onclick="clearForm()">Wissen</button>
+            </div>
+        </div>
+        <div class="filter-bar">
+            <input class="fi" id="filterSearch" placeholder="🔍 Zoek naam, beroep..." oninput="updateAll()">
+            <select class="fs" id="filterStage" onchange="updateAll()"><option value="">Alle fases</option><option value="intake">Intake</option><option value="screening">Screening</option><option value="interview">Interview</option><option value="shortlist">Shortlist</option><option value="pitched">Pitched</option><option value="cast">Gecast</option></select>
+            <select class="fs" id="filterArch" onchange="updateAll()"><option value="">Alle archetypes</option><option>🎯 Strategist</option><option>🤝 Loyalist</option><option>⚡ Rebel</option><option>👑 Leider</option><option>👁️ Observer</option><option>✨ Socialite</option><option>🎭 Acteur</option><option>❤️ Empaat</option><option>🔥 Provocateur</option></select>
+            <select class="fs" id="filterGender" onchange="updateAll()"><option value="">Alle genders</option><option>Man</option><option>Vrouw</option><option>Non-binair</option></select>
+            <select class="fs" id="sortBy" onchange="updateAll()"><option value="">Sorteer...</option><option value="naam">Naam A-Z</option><option value="naam-desc">Naam Z-A</option><option value="leeftijd">Leeftijd ↑</option><option value="leeftijd-desc">Leeftijd ↓</option><option value="score">Score ↑</option><option value="score-desc">Score ↓</option><option value="recent">Recent toegevoegd</option></select>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+            <div style="font-size:13px;color:var(--text-dim);" id="kCount"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="btn btn-g btn-s" onclick="selectAllK()">Alles selecteren</button>
+                <button class="btn btn-g btn-s" onclick="bulkAnalyse()">🤖 Bulk Analyse</button>
+                <button class="btn btn-g btn-s" onclick="copyToProject()">📋 Kopieer → Project</button>
+                <button class="btn btn-g btn-s" onclick="aiOptimizeCast()">🎯 AI Optimizer</button>
+                <button class="btn btn-g btn-s" onclick="exportPitchSheets()">📄 Pitch Sheets</button>
+                <button class="btn btn-g btn-s" onclick="showTab('rapport')">📋 Rapport Generator</button>
+            </div>
+        </div>
+        <div id="bulkProgress" style="display:none" class="card"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-bottom:4px"><span id="bulkLabel">Analyseren...</span><span id="bulkCount">0/0</span></div><div class="progress-wrap"><div class="progress-fill" id="bulkFill" style="width:0%"></div></div></div>
+        <div class="k-grid" id="kGrid"></div>
+        <div class="empty" id="kEmpty"><div class="ei">👥</div><p>Voeg kandidaten toe om te beginnen.</p><p style="font-size:11px;margin-top:8px;color:var(--text-muted)">Vul het formulier hierboven in met naam, leeftijd en beroep. Tip: druk <kbd style="background:var(--surface-3);padding:1px 5px;border-radius:3px;font-size:10px">N</kbd> om snel naar het formulier te springen.</p></div>
+    </div>
+
+    <!-- ══════ AI ANALYSE ══════ -->
+    <div class="tab-content" id="tc-analyse">
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                <div>
+                    <div class="card-title" style="margin-bottom:4px;"><span class="ic" style="background:var(--accent-glow);">🤖</span> Groepsanalyse</div>
+                    <p style="font-size:12px;color:var(--text-dim);">Selecteer min. 3 kandidaten via het ✓ vakje.</p>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn btn-g btn-s" onclick="selectAllK()">Selecteer Alles</button>
+                    <button class="btn btn-p btn-l" id="btnAnalyse" onclick="runGroupAnalysis()" disabled>🤖 Analyseer (<span id="selCount">0</span>)</button>
+                </div>
+            </div>
+        </div>
+        <div id="analyseOut"></div>
+        <div class="empty" id="analyseEmpty"><div class="ei">🔍</div><p>Selecteer kandidaten en start de AI analyse.</p><p style="font-size:11px;margin-top:8px;color:var(--text-muted)">Ga naar Kandidaten, vink min. 3 aan via het ✓ vakje, en kom hier terug. Of klik "Selecteer Alles" hierboven.</p></div>
+    </div>
+
+    <!-- ══════ RELATIE MATRIX ══════ -->
+    <div class="tab-content" id="tc-matrix">
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                <div>
+                    <div class="card-title" style="margin-bottom:4px;"><span class="ic" style="background:var(--pink-dim);">🔗</span> Relatie & Conflict Matrix</div>
+                    <p style="font-size:12px;color:var(--text-dim);">AI genereert conflict- en alliantiescores tussen alle geselecteerde kandidaten.</p>
+                </div>
+                <button class="btn btn-p" id="btnMatrix" onclick="runMatrix()" disabled>🤖 Genereer Matrix</button>
+            </div>
+        </div>
+        <div id="matrixOut" style="overflow-x:auto;"></div>
+        <div class="empty" id="matrixEmpty"><div class="ei">🔗</div><p>Selecteer min. 3 kandidaten en genereer de relatie matrix.</p><p style="font-size:11px;margin-top:8px;color:var(--text-muted)">De matrix toont conflict- en alliantiescores tussen alle kandidaten. Hoe meer je er selecteert, hoe interessanter het wordt.</p></div>
+    </div>
+
+    <!-- ══════ DIVERSITEIT ══════ -->
+    <div class="tab-content" id="tc-diversiteit">
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--cyan-dim);">📊</span> Diversiteits Dashboard</div>
+            <div id="divContent"></div>
+            <div class="empty" id="divEmpty"><div class="ei">📊</div><p>Voeg kandidaten toe om diversiteitsoverzicht te zien.</p><p style="font-size:11px;margin-top:8px;color:var(--text-muted)">Dit dashboard toont automatisch de verdeling van gender, leeftijd, archetype en achtergrond zodra je kandidaten hebt.</p></div>
+        </div>
+    </div>
+
+    <!-- ══════ VERGELIJK ══════ -->
+    <div class="tab-content" id="tc-vergelijk">
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--amber-dim);">⚖️</span> Kandidaten Vergelijken</div>
+            <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Selecteer precies 2 of 3 kandidaten en laat AI uitleggen wie het beste past.</p>
+            <button class="btn btn-p" id="btnCompare" onclick="runCompare()" disabled>⚖️ Vergelijk (<span id="compCount">0</span>)</button>
+        </div>
+        <div id="compVisual"></div>
+        <div id="compOut"></div>
+    </div>
+
+    <!-- ══════ SCENARIO ══════ -->
+    <div class="tab-content" id="tc-scenario">
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--red-dim);">🎭</span> Scenario Simulator</div>
+            <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Beschrijf een situatie en AI voorspelt hoe elke geselecteerde kandidaat reageert.</p>
+            <div class="fg" style="margin-bottom:12px;">
+                <label class="fl">Scenario</label>
+                <textarea class="ft" id="scenarioInput" placeholder="Bijv: De groep moet stemmen wie er weg moet. Er zijn 2 allianties ontstaan. Eén kandidaat liegt over een geheim verbond..."></textarea>
+            </div>
+            <div class="chips" style="margin-bottom:12px;">
+                <span class="chip" onclick="setScenario('De groep moet iemand verbannen na een verraad')">Verbannen na verraad</span>
+                <span class="chip" onclick="setScenario('Twee kandidaten beschuldigen elkaar van liegen')">Beschuldiging</span>
+                <span class="chip" onclick="setScenario('Er wordt een geheim onthuld dat alles verandert')">Geheim onthuld</span>
+                <span class="chip" onclick="setScenario('De groep moet samenwerken onder extreme druk')">Onder druk</span>
+                <span class="chip" onclick="setScenario('Eén persoon krijgt stiekem een voordeel of immuniteit')">Geheim voordeel</span>
+            </div>
+            <button class="btn btn-p" id="btnScenario" onclick="runScenario()" disabled>🎭 Simuleer</button>
+        </div>
+        <div id="scenarioOut"></div>
+    </div>
+
+
+    <!-- ══════ SHOW DNA ══════ -->
+    <div class="tab-content" id="tc-showdna">
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--cyan-dim);">🧬</span> Show DNA — Ideale Cast Recept</div>
+            <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Aanbevolen archetype-verdeling per show. Groen = gevuld, gestippeld rood = nog nodig.</p>
+            <div id="dnaContent"></div>
+        </div>
+    </div>
+
+    <!-- ══════ EQ TEST ══════ -->
+    <div class="tab-content" id="tc-eqtest">
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--pink-dim);">🧠</span> EQ / Persoonlijkheidstest</div>
+            <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Genereer een test die kandidaten zelf invullen, of vul in voor een kandidaat.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                <select class="fs" id="eqTarget" style="max-width:250px"><option value="">— Kies kandidaat —</option></select>
+                <button class="btn btn-p btn-s" onclick="showEQTest()">🧠 Start Test</button>
+                <button class="btn btn-g btn-s" onclick="generateEQLink()">🔗 Genereer Link</button>
+            </div>
+            <div id="eqLinkOut"></div>
+        </div>
+        <div id="eqPreview"></div>
+    </div>
+
+    <!-- ══════ AI CHAT ══════ -->
+    <div class="tab-content" id="tc-chat">
+        <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+                <div class="card-title" style="margin-bottom:0;"><span class="ic" style="background:var(--accent-glow);">💬</span> AI Casting Assistent</div>
+                <button class="btn btn-g btn-s" onclick="clearChat()">🗑️</button>
+            </div>
+            <div class="chat-wrap">
+                <div class="chat-msgs" id="chatMsgs"><div class="chat-msg ai"><div class="bubble">Hoi! Stel me vragen over je kandidatenpool, casting strategie, of groepsdynamiek.</div></div></div>
+                <div class="chat-input"><input class="fi" id="chatInput" placeholder="Stel een vraag..." onkeydown="if(event.key==='Enter')sendChat()"><button class="btn btn-p" onclick="sendChat()">→</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════ SETTINGS ══════ -->
+    <div class="tab-content" id="tc-settings">
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--accent-glow);">🔑</span> Claude API Key</div>
+            <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Haal je key op via <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent);">console.anthropic.com</a>. Wordt alleen lokaal opgeslagen.</p>
+            <div style="display:flex;gap:8px;">
+                <input class="fi" id="apiKeyIn" type="password" placeholder="sk-ant-api03-..." style="flex:1;font-family:var(--mono);font-size:12px;">
+                <button class="btn btn-p" onclick="saveKey()">Opslaan</button>
+                <button class="btn btn-g" onclick="toggleKey()">👁️</button>
+            </div>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:6px;" id="keyStat"></p>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--green-dim);">🤖</span> AI Model</div>
+            <select class="fs" id="modelSel" onchange="saveModel()" style="max-width:350px;">
+                <option value="claude-sonnet-4-5-20250929">Claude Sonnet 4.5 (snel, goedkoop)</option>
+                <option value="claude-opus-4-6">Claude Opus 4.6 (beste, $5/$25)</option>
+                <option value="claude-opus-4-5-20251101">Claude Opus 4.5 (sterk)</option>
+                <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (snelst, goedkoopst)</option>
+            </select>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--amber-dim);">💾</span> Data</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-g" onclick="exportAll()">📥 Export JSON</button>
+                <button class="btn btn-g" onclick="document.getElementById('impF').click()">📤 Import JSON</button>
+                <input type="file" id="impF" accept=".json" style="display:none" onchange="importAll(event)">
+                <button class="btn btn-d" onclick="clearAll()">🗑️ Wis Alles</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--cyan-dim);">❓</span> Help & FAQ</div>
+            <div id="faqContent" style="font-size:12px;line-height:1.7;color:var(--text-dim);">
+                <details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;color:var(--text);padding:6px 0;">Hoe werkt de Pipeline?</summary><div style="padding:6px 0 6px 12px;">De pipeline heeft 6 fases: Intake → Screening → Interview → Shortlist → Pitched → Gecast. Sleep kandidaten tussen fases of gebruik de ◀ ▶ knoppen op de kaartjes. Alleen kandidaten in Shortlist of verder tellen mee voor Show DNA.</div></details>
+                <details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;color:var(--text);padding:6px 0;">Waarom zijn Big Five scores en casting scores leeg?</summary><div style="padding:6px 0 6px 12px;">Scores worden gegenereerd door de AI. Ga naar de Kandidaten tab, klik op een kandidaat en kies "🤖 AI Profiel". Of selecteer meerdere kandidaten en gebruik "Bulk AI Analyse" voor iedereen tegelijk. Je hebt hiervoor een API key nodig (zie bovenaan deze pagina).</div></details>
+                <details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;color:var(--text);padding:6px 0;">Waarom is Show DNA leeg (0%)?</summary><div style="padding:6px 0 6px 12px;">Show DNA telt alleen kandidaten die: 1) een archetype hebben (wordt automatisch toegewezen bij AI Profiel analyse), en 2) in fase Shortlist, Pitched of Gecast staan. Verplaats kandidaten door de pipeline om het percentage te zien stijgen.</div></details>
+                <details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;color:var(--text);padding:6px 0;">Hoe selecteer ik kandidaten voor analyse?</summary><div style="padding:6px 0 6px 12px;">Ga naar de Kandidaten tab en klik het ✓ vakje op een kaartje aan. Of druk <kbd style="background:var(--surface-3);padding:1px 5px;border-radius:3px;font-size:10px">A</kbd> om alles te selecteren. De selectie werkt door in AI Analyse, Matrix, Vergelijk en Scenario tabs.</div></details>
+                <details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;color:var(--text);padding:6px 0;">Wat kost het gebruik van AI?</summary><div style="padding:6px 0 6px 12px;">De app gebruikt je eigen Claude API key. Kosten hangen af van het gekozen model: Haiku is het goedkoopst (~$0.001 per analyse), Sonnet is een goede balans, Opus is het slimst maar duurder. Eén profiel analyse kost gemiddeld ~500-1000 tokens.</div></details>
+                <details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;color:var(--text);padding:6px 0;">Worden mijn gegevens online opgeslagen?</summary><div style="padding:6px 0 6px 12px;">Nee. Alle data (kandidaten, notities, foto's) wordt lokaal opgeslagen in je browser (localStorage). Er is geen server of account. Gebruik Export JSON om backups te maken. Let op: localStorage heeft een limiet van ~5MB — veel foto's kunnen dit snel vullen.</div></details>
+                <details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;color:var(--text);padding:6px 0;">Wat doet de AI Chat?</summary><div style="padding:6px 0 6px 12px;">De AI Chat (💬 tab) is een vrije gesprekspartner die je hele kandidatenpool kent. Stel vragen als "Wie is de meest strategische kandidaat?", "Welke 2 kandidaten gaan botsen?", of "Stel een cast voor van 8 mensen". De chat onthoudt context binnen het gesprek.</div></details>
+                <details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;color:var(--text);padding:6px 0;">Keyboard shortcuts</summary><div style="padding:6px 0 6px 12px;"><kbd style="background:var(--surface-3);padding:1px 5px;border-radius:3px;font-size:10px">N</kbd> Nieuw kandidaat · <kbd style="background:var(--surface-3);padding:1px 5px;border-radius:3px;font-size:10px">A</kbd> Selecteer alles · <kbd style="background:var(--surface-3);padding:1px 5px;border-radius:3px;font-size:10px">1-9</kbd> Tabs · <kbd style="background:var(--surface-3);padding:1px 5px;border-radius:3px;font-size:10px">Ctrl+Z</kbd> Undo · <kbd style="background:var(--surface-3);padding:1px 5px;border-radius:3px;font-size:10px">?</kbd> Help overlay</div></details>
+            </div>
+        </div>
+    </div>
+    <!-- ══════ RAPPORT GENERATOR ══════ -->
+    <div class="tab-content" id="tc-rapport">
+        <div class="card">
+            <div class="card-title"><span class="ic" style="background:var(--accent-glow);">📄</span> Rapport Generator</div>
+            <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Stel je casting rapport samen. Vink aan wat je wilt opnemen en kies je exportformaat.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+                <!-- Kolom 1: Overzicht -->
+                <div style="background:var(--surface-2);border-radius:10px;padding:16px;border:1px solid var(--border);">
+                    <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text);">📊 Overzicht</div>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_cover" checked> <span>Voorpagina met logo & statistieken</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_pipeline" checked> <span>Pipeline verdeling (visueel)</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_gender" checked> <span>Gender verdeling</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_archetype" checked> <span>Archetype verdeling</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_showdna" checked> <span>Show DNA — Cast compleetheid</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_diversity"> <span>Leeftijdsverdeling</span></label>
+                </div>
+
+                <!-- Kolom 2: Kandidaat Details -->
+                <div style="background:var(--surface-2);border-radius:10px;padding:16px;border:1px solid var(--border);">
+                    <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text);">👥 Per Kandidaat</div>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_photo" checked> <span>Foto</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_basic" checked> <span>Basisinfo (naam, leeftijd, beroep)</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_desc" checked> <span>Persoonlijkheidsbeschrijving</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_big5" checked> <span>Big Five scores</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_score" checked> <span>Casting score (TV / Uniek / Social)</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_social"> <span>Social media links</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_video"> <span>Video link</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_eq"> <span>EQ test antwoorden</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_notes" checked> <span>Team notities</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_history"> <span>Pipeline geschiedenis</span></label>
+                </div>
+            </div>
+
+            <!-- Kolom 3: AI Analyses -->
+            <div style="background:var(--surface-2);border-radius:10px;padding:16px;border:1px solid var(--border);margin-bottom:20px;">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text);">🤖 AI Analyses</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px;">
+                    <label class="rpt-check"><input type="checkbox" id="rpt_group"> <span>Groepsanalyse resultaat</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_matrix"> <span>Relatie & Conflict Matrix</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_compare"> <span>Vergelijkingsanalyse</span></label>
+                    <label class="rpt-check"><input type="checkbox" id="rpt_scenario"> <span>Scenario simulatie</span></label>
+                </div>
+            </div>
+
+            <!-- Filter -->
+            <div style="background:var(--surface-2);border-radius:10px;padding:16px;border:1px solid var(--border);margin-bottom:20px;">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text);">🔽 Filter Kandidaten</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                    <label class="rpt-check" style="margin:0"><input type="checkbox" id="rpt_all_stages" checked onchange="toggleRptStages(this.checked)"> <span>Alle fases</span></label>
+                    <span style="color:var(--text-muted);font-size:11px;">of selecteer:</span>
+                    <label class="rpt-check rpt-stage" style="margin:0"><input type="checkbox" class="rpt-stage-cb" value="intake" checked> <span>Intake</span></label>
+                    <label class="rpt-check rpt-stage" style="margin:0"><input type="checkbox" class="rpt-stage-cb" value="screening" checked> <span>Screening</span></label>
+                    <label class="rpt-check rpt-stage" style="margin:0"><input type="checkbox" class="rpt-stage-cb" value="interview" checked> <span>Interview</span></label>
+                    <label class="rpt-check rpt-stage" style="margin:0"><input type="checkbox" class="rpt-stage-cb" value="shortlist" checked> <span>Shortlist</span></label>
+                    <label class="rpt-check rpt-stage" style="margin:0"><input type="checkbox" class="rpt-stage-cb" value="pitched" checked> <span>Pitched</span></label>
+                    <label class="rpt-check rpt-stage" style="margin:0"><input type="checkbox" class="rpt-stage-cb" value="cast" checked> <span>Gecast</span></label>
+                </div>
+            </div>
+
+            <!-- Acties -->
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                <button class="btn btn-p" onclick="generateReport('pdf')" style="padding:10px 24px;font-size:14px;">📄 Genereer PDF</button>
+                <button class="btn btn-g" onclick="generateReport('word')" style="padding:10px 24px;font-size:14px;">📝 Genereer Word</button>
+                <button class="btn btn-g btn-s" onclick="rptSelectAll(true)">✅ Alles aan</button>
+                <button class="btn btn-g btn-s" onclick="rptSelectAll(false)">⬜ Alles uit</button>
+                <span style="font-size:11px;color:var(--text-muted);margin-left:auto;" id="rptKCount"></span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modalBg" style="display:none" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <h2 id="mTitle">—</h2>
+            <button class="btn btn-g btn-s" onclick="closeModal()">✕</button>
+        </div>
+        <div id="mBody"></div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CastMatch Pro v3 — Complete JavaScript
+// ═══════════════════════════════════════════
+const STAGES=['intake','screening','interview','shortlist','pitched','cast'];
+const SN={intake:'Intake',screening:'Screening',interview:'Interview',shortlist:'Shortlist',pitched:'Pitched',cast:'Gecast'};
+const SC={intake:'ph-intake',screening:'ph-screen',interview:'ph-interview',shortlist:'ph-shortlist',pitched:'ph-pitched',cast:'ph-cast'};
+const SHOWS=['De Verraders','Wie is de Mol','Expeditie Robinson','Big Brother','Temptation Island','The Traitors Int.','The Mole Int.','Love Island','Anders'];
+const ARCHETYPES=['🎯 Strategist','🤝 Loyalist','⚡ Rebel','👑 Leider','👁️ Observer','✨ Socialite','🎭 Acteur','❤️ Empaat','🔥 Provocateur'];
+const SHOW_DNA={
+'De Verraders':{'🎯 Strategist':2,'🤝 Loyalist':3,'⚡ Rebel':1,'👑 Leider':2,'👁️ Observer':1,'✨ Socialite':2,'🎭 Acteur':2,'❤️ Empaat':2,'🔥 Provocateur':1},
+'Wie is de Mol':{'🎯 Strategist':2,'🤝 Loyalist':2,'⚡ Rebel':1,'👑 Leider':1,'👁️ Observer':2,'✨ Socialite':1,'🎭 Acteur':2,'❤️ Empaat':1,'🔥 Provocateur':1},
+'Expeditie Robinson':{'🎯 Strategist':2,'🤝 Loyalist':2,'⚡ Rebel':2,'👑 Leider':2,'👁️ Observer':1,'✨ Socialite':2,'🎭 Acteur':1,'❤️ Empaat':2,'🔥 Provocateur':2},
+'Big Brother':{'🎯 Strategist':1,'🤝 Loyalist':2,'⚡ Rebel':2,'👑 Leider':1,'👁️ Observer':1,'✨ Socialite':3,'🎭 Acteur':2,'❤️ Empaat':2,'🔥 Provocateur':2},
+'Temptation Island':{'🎯 Strategist':1,'🤝 Loyalist':2,'⚡ Rebel':2,'👑 Leider':1,'👁️ Observer':0,'✨ Socialite':3,'🎭 Acteur':2,'❤️ Empaat':1,'🔥 Provocateur':3},
+'The Traitors Int.':{'🎯 Strategist':3,'🤝 Loyalist':3,'⚡ Rebel':1,'👑 Leider':2,'👁️ Observer':2,'✨ Socialite':2,'🎭 Acteur':3,'❤️ Empaat':2,'🔥 Provocateur':1},
+'The Mole Int.':{'🎯 Strategist':2,'🤝 Loyalist':2,'⚡ Rebel':1,'👑 Leider':1,'👁️ Observer':3,'✨ Socialite':1,'🎭 Acteur':2,'❤️ Empaat':1,'🔥 Provocateur':1},
+'Love Island':{'🎯 Strategist':1,'🤝 Loyalist':2,'⚡ Rebel':2,'👑 Leider':1,'👁️ Observer':0,'✨ Socialite':3,'🎭 Acteur':2,'❤️ Empaat':2,'🔥 Provocateur':2}
+};
+const EQ_QS=[
+{q:"Als iemand emotioneel wordt, wat doe jij?",o:["Troosten","Afstand houden","Analyseren","Meevoelen"]},
+{q:"Je merkt dat iemand liegt. Eerste reactie?",o:["Confronteren","Bewijs verzamelen","Negeren","Subtiel laten merken"]},
+{q:"Groep moet moeilijke beslissing nemen. Jouw rol?",o:["Leiding nemen","Meerderheid volgen","Advocaat vd duivel","Bemiddelen"]},
+{q:"Iemand bekritiseert je openlijk. Reactie?",o:["Verdedigen","Kalmeren","Tegenaanvallen","Later bespreken"]},
+{q:"Je hebt een geheim dat de groep helpt. Deel je het?",o:["Ja direct","Alleen vertrouwde","Nee bewaren","Hangt van voordeel af"]},
+{q:"Hoe ga je om met onzekerheid?",o:["Controle nemen","Met de stroom","Plan maken","Bondgenoot zoeken"]},
+{q:"Wat beschrijft jou onder druk?",o:["Kalm gefocust","Emotioneel maar functioneel","Chaotisch creatief","Bevroren"]},
+{q:"Oneerlijk behandeld. Reactie?",o:["Kwaad worden","Strategisch reageren","Accepteren","Wraak plannen"]},
+{q:"Wat is belangrijker in een groep?",o:["Eerlijkheid","Harmonie","Resultaat","Loyaliteit"]},
+{q:"Je moet iemand nomineren. Hoe kies je?",o:["Zwakste schakel","Wie mij bedreigt","Minste bijdrage","Ik vermijd keuze"]}
+];
+
+let S={kandidaten:[],selected:new Set(),showType:'De Verraders',analyses:0};
+let projects=[],currentProject='',chatHistory=[],dragId=null,pendingPhoto=null,eqAnswers={};
+
+// ── Helpers ──
+function el(id){return document.getElementById(id);}
+function v(id){return el(id).value.trim();}
+function esc(s){if(!s)return '';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function fmt(t){return t.replace(/### (.*)/g,'<h3>$1</h3>').replace(/## (.*)/g,'<h3>$1</h3>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');}
+
+// ── Storage ──
+function load(){
+    try{
+        projects=JSON.parse(localStorage.getItem('cm3_projects')||'[]');
+        if(!projects.length){projects=[{id:'default',name:'Standaard Project',created:new Date().toISOString()}];saveProjects();}
+        currentProject=localStorage.getItem('cm3_current')||projects[0].id;
+        const d=JSON.parse(localStorage.getItem('cm3_'+currentProject)||'{}');
+        S.kandidaten=d.k||[];S.showType=d.st||'De Verraders';S.analyses=d.a||0;
+        chatHistory=JSON.parse(localStorage.getItem('cm3_chat_'+currentProject)||'[]');
+    }catch(e){console.error(e);}
+    const k=localStorage.getItem('cm3_key');if(k)el('apiKeyIn').value=k;
+    const m=localStorage.getItem('cm3_model');if(m)el('modelSel').value=m;
+    renderProjSel();
+}
+function save(){localStorage.setItem('cm3_'+currentProject,JSON.stringify({k:S.kandidaten,st:S.showType,a:S.analyses}));}
+function saveProjects(){localStorage.setItem('cm3_projects',JSON.stringify(projects));localStorage.setItem('cm3_current',currentProject);}
+function getKey(){return localStorage.getItem('cm3_key')||'';}
+function getModel(){return localStorage.getItem('cm3_model')||'claude-sonnet-4-20250514';}
+
+// ── Projects ──
+function renderProjSel(){el('projectSel').innerHTML=projects.map(p=>'<option value="'+p.id+'"'+(p.id===currentProject?' selected':'')+'>'+esc(p.name)+'</option>').join('');}
+function switchProject(){
+    currentProject=el('projectSel').value;saveProjects();
+    const d=JSON.parse(localStorage.getItem('cm3_'+currentProject)||'{}');
+    S.kandidaten=d.k||[];S.showType=d.st||'De Verraders';S.analyses=d.a||0;S.selected.clear();
+    chatHistory=JSON.parse(localStorage.getItem('cm3_chat_'+currentProject)||'[]');
+    initShowChips();updateAll();
+}
+function manageProjects(){
+    el('mTitle').textContent='📁 Projecten / Seizoenen';
+    let h='<div style="display:flex;gap:8px;margin-bottom:14px"><input class="fi" id="newPN" placeholder="Nieuw project..."><button class="btn btn-p btn-s" onclick="addProj()">➕</button></div>';
+    h+=projects.map(p=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;margin-bottom:6px"><div><strong>'+esc(p.name)+'</strong><br><span style="font-size:10px;color:var(--text-muted)">'+new Date(p.created).toLocaleDateString('nl-NL')+'</span></div><div style="display:flex;gap:4px">'+(p.id!==currentProject?'<button class="btn btn-g btn-s" onclick="switchToP(\''+p.id+'\')">Activeer</button>':'<span class="tag tag-g">Actief</span>')+(projects.length>1?'<button class="btn btn-d btn-s" onclick="delProj(\''+p.id+'\')">🗑️</button>':'')+'</div></div>').join('');
+    el('mBody').innerHTML=h;el('modalBg').style.display='flex';
+}
+function addProj(){const n=el('newPN').value.trim();if(!n)return;projects.push({id:'p_'+Date.now(),name:n,created:new Date().toISOString()});saveProjects();manageProjects();}
+function switchToP(id){el('projectSel').value=id;switchProject();closeModal();}
+function delProj(id){if(!confirm('Project verwijderen?'))return;projects=projects.filter(p=>p.id!==id);localStorage.removeItem('cm3_'+id);if(currentProject===id)currentProject=projects[0].id;saveProjects();renderProjSel();switchProject();manageProjects();}
+
+// ── Init ──
+load();initShowChips();updateAll();updateApiPill();checkStorage();
+if(chatHistory.length)renderChatHistory();
+
+function initShowChips(){el('showChips').innerHTML=SHOWS.map(s=>'<span class="chip '+(s===S.showType?'active':'')+'" onclick="pickShow(this,\''+s+'\')">'+s+'</span>').join('');}
+function pickShow(e,s){document.querySelectorAll('#showChips .chip').forEach(c=>c.classList.remove('active'));e.classList.add('active');S.showType=s;save();}
+
+// ── Tabs ──
+function showTab(t){
+    document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+    const tc=document.getElementById('tc-'+t),tb=document.querySelector('[data-t="'+t+'"]');
+    if(tc)tc.classList.add('active');if(tb)tb.classList.add('active');
+    if(t==='diversiteit')renderDiversity();if(t==='showdna')renderShowDNA();
+    if(t==='eqtest')renderEQTargets();if(t==='chat'){renderChatHistory();scrollChat();}
+    if(t==='vergelijk')renderVisualCompare();
+    if(t==='rapport')updateRptCount();
+}
+
+// ── Photo ──
+function previewFoto(input){
+    const f=input.files[0];if(!f){pendingPhoto=null;el('fotoPreview').innerHTML='';return;}
+    const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),sz=120;c.width=sz;c.height=sz;const ctx=c.getContext('2d'),mn=Math.min(img.width,img.height);ctx.drawImage(img,(img.width-mn)/2,(img.height-mn)/2,mn,mn,0,0,sz,sz);pendingPhoto=c.toDataURL('image/jpeg',0.7);el('fotoPreview').innerHTML='<img src="'+pendingPhoto+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover">';};img.src=e.target.result;};r.readAsDataURL(f);
+}
+
+// ── CRUD ──
+function addK(){
+    const naam=v('fNaam'),desc=v('fDesc');if(!naam||!desc)return alert('Vul naam en persoonlijkheid in.');
+    const dup=checkDuplicate(naam);if(dup&&!confirm('⚠️ "'+naam+'" bestaat al. Toch toevoegen?'))return;
+    pushUndo();
+    const notes=v('fNotes')?[{author:'Team',text:v('fNotes'),date:new Date().toISOString()}]:[];
+    S.kandidaten.push({id:Date.now(),naam,leeftijd:v('fLeeftijd'),beroep:v('fBeroep'),gender:v('fGender'),achtergrond:v('fAchtergrond'),archetype:v('fArchetype'),insta:v('fInsta'),tiktok:v('fTiktok'),video:v('fVideo')||'',desc,notes,stage:'intake',big5:null,photo:pendingPhoto,castScore:null,eqAnswers:null,history:[]});
+    clearForm();save();updateAll();checkStorage();toast('✅ '+naam+' toegevoegd','ok');
+}
+function removeK(id){if(!confirm('Verwijderen?'))return;pushUndo();S.kandidaten=S.kandidaten.filter(k=>k.id!==id);S.selected.delete(id);save();updateAll();toast('Kandidaat verwijderd','ok');}
+function toggleSel(id){S.selected.has(id)?S.selected.delete(id):S.selected.add(id);updateAll();}
+function selectAllK(){const f=getFiltered();if(f.every(k=>S.selected.has(k.id)))f.forEach(k=>S.selected.delete(k.id));else f.forEach(k=>S.selected.add(k.id));updateAll();}
+function setStage(id,stage){const k=S.kandidaten.find(x=>x.id===id);if(k){pushUndo();if(!k.history)k.history=[];k.history.push({from:k.stage,to:stage,date:new Date().toISOString()});k.stage=stage;save();updateAll();}}
+function clearForm(){['fNaam','fLeeftijd','fBeroep','fAchtergrond','fInsta','fTiktok','fVideo','fDesc','fNotes','fFotoUrl'].forEach(id=>{if(el(id))el(id).value='';});if(el('fGender'))el('fGender').selectedIndex=0;if(el('fArchetype'))el('fArchetype').selectedIndex=0;if(el('fFoto'))el('fFoto').value='';pendingPhoto=null;if(el('fotoPreview'))el('fotoPreview').innerHTML='';}
+
+// ── Filter ──
+function getFiltered(){
+    let l=[...S.kandidaten];
+    const q=(el('filterSearch')?el('filterSearch').value:'').toLowerCase();
+    const st=el('filterStage')?el('filterStage').value:'';
+    const ar=el('filterArch')?el('filterArch').value:'';
+    const gn=el('filterGender')?el('filterGender').value:'';
+    if(q)l=l.filter(k=>(k.naam+' '+k.beroep+' '+k.desc+' '+(k.achtergrond||'')).toLowerCase().includes(q));
+    if(st)l=l.filter(k=>k.stage===st);if(ar)l=l.filter(k=>k.archetype===ar);if(gn)l=l.filter(k=>k.gender===gn);
+    return sortKandidaten(l);
+}
+
+// ── Casting Score ──
+function calcScore(k){
+    if(!k.big5)return null;const b=k.big5;
+    const tv=Math.round(b.extraversion*0.35+b.openness*0.25+(100-b.agreeableness)*0.2+b.neuroticism*0.2);
+    const uniek=(k.achtergrond&&k.achtergrond!=='')?15:0;
+    const social=(k.insta||k.tiktok)?10:0;
+    return{total:Math.min(100,Math.round(tv*0.6+uniek+social+(k.desc.length>100?15:5))),tv,uniek,social};
+}
+
+// ── Update All ──
+function updateAll(){
+    const n=S.kandidaten.length;el('bTotal').textContent=n;
+    el('sTotal').textContent=n;
+    const stageIds={intake:'sIntake',screening:'sScreen',interview:'sInterview',shortlist:'sShortlist',pitched:'sPitched',cast:'sCast'};
+    STAGES.forEach(s=>{const c=S.kandidaten.filter(k=>k.stage===s).length;if(stageIds[s]&&el(stageIds[s]))el(stageIds[s]).textContent=c;});
+    el('selCount').textContent=S.selected.size;el('compCount').textContent=S.selected.size;
+    const f=getFiltered();el('kCount').textContent=f.length+(f.length!==n?' van '+n:'')+' kandidaten';
+    el('btnAnalyse').disabled=S.selected.size<3||!getKey();
+    el('btnMatrix').disabled=S.selected.size<3||!getKey();
+    el('btnCompare').disabled=S.selected.size<2||S.selected.size>3||!getKey();
+    el('btnScenario').disabled=S.selected.size<2||!getKey();
+    renderPipeline();renderKGrid();renderVisualCompare();checkStorage();
+}
+
+// ── Drag & Drop Pipeline ──
+function renderPipeline(){
+    el('pipelineView').innerHTML=STAGES.map((s,si)=>{
+        const items=S.kandidaten.filter(k=>k.stage===s);
+        return '<div class="pipeline-col"><div class="pipeline-header '+SC[s]+'">'+SN[s]+' <span>'+items.length+'</span></div>'+
+        '<div class="pipeline-body" data-stage="'+s+'" ondragover="dOver(event)" ondrop="dDrop(event,\''+s+'\')" ondragleave="dLeave(event)">'+
+        (items.length?items.map(k=>{
+            const prevStage=si>0?STAGES[si-1]:null;
+            const nextStage=si<STAGES.length-1?STAGES[si+1]:null;
+            return '<div class="pipeline-card" draggable="true" ondragstart="dStart(event,'+k.id+')" ondragend="dEnd(event)" ontouchstart="tStart(event,'+k.id+')">'+
+            '<div class="name">'+(k.photo?'<img src="'+k.photo+'">':'')+esc(k.naam)+'</div>'+
+            '<div class="meta">'+(k.archetype||'')+' '+(k.leeftijd?'· '+k.leeftijd+'j':'')+'</div>'+
+            (k.castScore?'<div class="sc-pill" style="background:'+(k.castScore.total>=70?'var(--green-dim)':k.castScore.total>=40?'var(--amber-dim)':'var(--red-dim)')+';color:'+(k.castScore.total>=70?'var(--green)':k.castScore.total>=40?'var(--amber)':'var(--red)')+'">⭐'+k.castScore.total+'</div>':'')+
+            '<div style="display:flex;gap:4px;margin-top:6px">'+
+            (prevStage?'<button class="stage-btn" onclick="event.stopPropagation();setStage('+k.id+',\''+prevStage+'\')" title="Naar '+SN[prevStage]+'">◀ '+SN[prevStage]+'</button>':'')+
+            '<button class="stage-btn" onclick="event.stopPropagation();showKDetail('+k.id+')" title="Details">👁️</button>'+
+            (nextStage?'<button class="stage-btn" onclick="event.stopPropagation();setStage('+k.id+',\''+nextStage+'\')" title="Naar '+SN[nextStage]+'">'+SN[nextStage]+' ▶</button>':'')+
+            '</div></div>';
+        }).join(''):'<div style="color:var(--text-muted);font-size:11px;padding:12px;text-align:center">Nog geen kandidaten<br><span style="font-size:10px">Verplaats via knoppen of drag & drop</span></div>')+
+        '</div></div>';
+    }).join('');
+}
+function dStart(e,id){dragId=id;e.target.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function dEnd(e){e.target.classList.remove('dragging');dragId=null;document.querySelectorAll('.pipeline-body').forEach(b=>b.classList.remove('drag-over'));}
+function dOver(e){e.preventDefault();e.currentTarget.classList.add('drag-over');}
+function dLeave(e){e.currentTarget.classList.remove('drag-over');}
+function dDrop(e,stage){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(dragId)setStage(dragId,stage);}
+// Touch drag & drop voor mobiel
+let touchDragId=null,touchGhost=null;
+function tStart(e,id){touchDragId=id;const t=e.touches[0];const card=e.currentTarget;touchGhost=card.cloneNode(true);touchGhost.style.cssText='position:fixed;z-index:9999;pointer-events:none;opacity:0.8;width:'+card.offsetWidth+'px;top:'+(t.clientY-20)+'px;left:'+(t.clientX-20)+'px;';document.body.appendChild(touchGhost);}
+document.addEventListener('touchmove',e=>{if(!touchDragId||!touchGhost)return;const t=e.touches[0];touchGhost.style.top=(t.clientY-20)+'px';touchGhost.style.left=(t.clientX-20)+'px';e.preventDefault();},{passive:false});
+document.addEventListener('touchend',e=>{if(!touchDragId)return;if(touchGhost){touchGhost.remove();touchGhost=null;}const t=e.changedTouches[0];const el2=document.elementFromPoint(t.clientX,t.clientY);const body=el2?el2.closest('.pipeline-body'):null;if(body){const stage=body.dataset.stage;if(stage)setStage(touchDragId,stage);}touchDragId=null;});
+
+// ── Kandidaten Grid ──
+function renderKGrid(){
+    const grid=el('kGrid'),empty=el('kEmpty'),f=getFiltered();
+    if(!f.length){grid.innerHTML=S.kandidaten.length?'<div class="empty"><div class="ei">🔍</div><p>Geen resultaten voor deze filters.</p></div>':'';empty.style.display=S.kandidaten.length?'none':'block';return;}
+    empty.style.display='none';
+    grid.innerHTML=f.map(k=>{
+        const sel=S.selected.has(k.id);const sc=k.castScore||calcScore(k);if(sc&&!k.castScore){k.castScore=sc;save();}
+        return '<div class="k-card '+(sel?'sel':'')+' fade">'+
+        '<div class="k-check '+(sel?'on':'')+'" onclick="toggleSel('+k.id+')">'+(sel?'✓':'')+'</div>'+
+        '<div class="k-name">'+(k.photo?'<img src="'+k.photo+'">':'')+esc(k.naam)+'</div>'+
+        '<div class="k-meta">'+(k.leeftijd?k.leeftijd+'j':'')+(k.leeftijd&&k.beroep?' · ':'')+esc(k.beroep||'')+' '+(k.gender?'· '+k.gender:'')+'</div>'+
+        '<div class="k-desc">'+esc(k.desc.length>120?k.desc.substring(0,120)+'...':k.desc)+'</div>'+
+        '<div class="k-tags">'+(k.archetype?'<span class="tag tag-a">'+esc(k.archetype)+'</span>':'')+
+        '<span class="tag tag-b">'+SN[k.stage]+'</span>'+
+        (k.insta?'<span class="tag tag-p">IG</span>':'')+(k.video?'<span class="tag tag-p">🎥</span>':'')+
+        (sc?'<span class="tag '+(sc.total>=70?'tag-g':sc.total>=40?'tag-a':'tag-r')+'">⭐'+sc.total+'</span>':'')+'</div>'+
+        '<div class="stage-sel">'+STAGES.map(s=>'<button class="stage-btn '+(k.stage===s?'current':'')+'" onclick="event.stopPropagation();setStage('+k.id+',\''+s+'\')">'+SN[s]+'</button>').join('')+'</div>'+
+        '<div class="k-actions">'+
+        '<button class="btn btn-g btn-s" onclick="aiProfile('+k.id+')" title="AI Profiel">🤖</button>'+
+        '<button class="btn btn-g btn-s" onclick="deepSearch('+k.id+')" title="Deep Search / Due Diligence">🔍</button>'+
+        '<button class="btn btn-g btn-s" onclick="showKDetail('+k.id+')" title="Details">👁️</button>'+
+        '<button class="btn btn-g btn-s" onclick="editK('+k.id+')" title="Bewerken">✏️</button>'+
+        '<button class="btn btn-d btn-s" onclick="removeK('+k.id+')" title="Verwijderen">🗑️</button>'+
+        '</div></div>';
+    }).join('');
+}
+
+// ── Edit ──
+function editK(id){
+    const k=S.kandidaten.find(x=>x.id===id);if(!k)return;
+    el('mTitle').textContent='✏️ '+k.naam;
+    const gOpts=['','Man','Vrouw','Non-binair','Anders'].map(g=>'<option'+(k.gender===g?' selected':'')+'>'+g+'</option>').join('');
+    const aOpts=[''].concat(ARCHETYPES).map(a=>'<option value="'+a+'"'+(k.archetype===a?' selected':'')+'>'+( a||'— Kies —')+'</option>').join('');
+    el('mBody').innerHTML='<div class="form-row">'+
+    '<div class="fg"><label class="fl">Naam</label><input class="fi" id="eN" value="'+esc(k.naam)+'"></div>'+
+    '<div class="fg"><label class="fl">Leeftijd</label><input class="fi" id="eL" type="number" value="'+(k.leeftijd||'')+'"></div>'+
+    '<div class="fg"><label class="fl">Beroep</label><input class="fi" id="eB" value="'+esc(k.beroep||'')+'"></div>'+
+    '<div class="fg"><label class="fl">Gender</label><select class="fs" id="eG">'+gOpts+'</select></div>'+
+    '<div class="fg"><label class="fl">Achtergrond</label><input class="fi" id="eAch" value="'+esc(k.achtergrond||'')+'"></div>'+
+    '<div class="fg"><label class="fl">Archetype</label><select class="fs" id="eAr">'+aOpts+'</select></div>'+
+    '<div class="fg"><label class="fl">Instagram</label><input class="fi" id="eIg" value="'+esc(k.insta||'')+'"></div>'+
+    '<div class="fg"><label class="fl">TikTok</label><input class="fi" id="eTt" value="'+esc(k.tiktok||'')+'"></div>'+
+    '<div class="fg"><label class="fl">Video</label><input class="fi" id="eV" value="'+esc(k.video||'')+'"></div>'+
+    '<div class="fg"><label class="fl">Foto</label><input type="file" id="eFoto" accept="image/*" style="font-size:12px;color:var(--text-dim)" onchange="previewEditFoto(this)">'+(k.photo?'<div id="editFotoPreview" style="margin-top:4px"><img src="'+k.photo+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover"></div>':'<div id="editFotoPreview" style="margin-top:4px"></div>')+'</div>'+
+    '<div class="fg form-full"><label class="fl">Beschrijving</label><textarea class="ft" id="eD">'+esc(k.desc)+'</textarea></div>'+
+    '</div><div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-p" onclick="saveEdit('+id+')">💾 Opslaan</button><button class="btn btn-g" onclick="closeModal()">Annuleren</button></div>';
+    window._editPhoto=k.photo||null;
+    el('modalBg').style.display='flex';
+}
+function previewEditFoto(input){
+    const f=input.files[0];if(!f){window._editPhoto=null;el('editFotoPreview').innerHTML='';return;}
+    const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),sz=120;c.width=sz;c.height=sz;const ctx=c.getContext('2d'),mn=Math.min(img.width,img.height);ctx.drawImage(img,(img.width-mn)/2,(img.height-mn)/2,mn,mn,0,0,sz,sz);window._editPhoto=c.toDataURL('image/jpeg',0.7);el('editFotoPreview').innerHTML='<img src="'+window._editPhoto+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover">';};img.src=e.target.result;};r.readAsDataURL(f);
+}
+function saveEdit(id){
+    const k=S.kandidaten.find(x=>x.id===id);if(!k)return;
+    k.naam=el('eN').value.trim()||k.naam;k.leeftijd=el('eL').value.trim();k.beroep=el('eB').value.trim();
+    k.gender=el('eG').value;k.achtergrond=el('eAch').value.trim();k.archetype=el('eAr').value;
+    k.insta=el('eIg').value.trim();k.tiktok=el('eTt').value.trim();
+    k.video=el('eV').value.trim();k.desc=el('eD').value.trim()||k.desc;
+    if(window._editPhoto!==undefined)k.photo=window._editPhoto;
+    k.castScore=calcScore(k);
+    save();updateAll();closeModal();
+}
+
+// ── Detail Modal + Notes ──
+function showKDetail(id){
+    const k=S.kandidaten.find(x=>x.id===id);if(!k)return;
+    el('mTitle').textContent=k.naam;
+    let h='<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">';
+    if(k.photo)h+='<img src="'+k.photo+'" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">';
+    h+='<div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">'+(k.leeftijd?k.leeftijd+' jaar':'')+' '+(k.beroep?'· '+esc(k.beroep):'')+' '+(k.gender?'· '+k.gender:'')+' '+(k.achtergrond?'· '+esc(k.achtergrond):'')+'</div>';
+    h+=(k.archetype?'<span class="tag tag-a">'+esc(k.archetype)+'</span> ':'')+' <span class="tag tag-b">'+SN[k.stage]+'</span>';
+    if(k.insta)h+=' <span class="tag tag-p">IG: '+esc(k.insta)+'</span>';if(k.tiktok)h+=' <span class="tag tag-p">TT: '+esc(k.tiktok)+'</span>';
+    if(k.video){const vUrl=k.video.match(/^https?:\/\//i)?k.video:'';if(vUrl)h+='<br><a href="'+esc(vUrl)+'" target="_blank" rel="noopener" style="color:var(--accent);font-size:12px;margin-top:4px;display:inline-block">🎥 Bekijk video</a>';}
+    h+='</div></div>';
+    h+='<div style="font-size:13px;line-height:1.7;margin-bottom:14px">'+esc(k.desc)+'</div>';
+    const sc=k.castScore||calcScore(k);
+    if(sc)h+='<div style="display:flex;align-items:center;gap:8px;margin:10px 0"><div class="score-ring '+(sc.total>=70?'high':sc.total>=40?'mid':'low')+'">'+sc.total+'</div><div><div style="font-size:12px;font-weight:600">Casting Score</div><div style="font-size:10px;color:var(--text-dim);font-family:var(--mono)">TV:'+sc.tv+' Uniek:'+sc.uniek+' Social:'+sc.social+'</div></div></div>';
+    if(k.big5)h+=renderBig5(k.big5);
+    if(k.eqAnswers)h+='<div style="margin:14px 0;padding:12px;background:var(--surface-3);border-radius:7px"><div style="font-size:12px;font-weight:600;color:var(--pink);margin-bottom:6px">🧠 EQ Antwoorden</div>'+k.eqAnswers.map((a,i)=>'<div style="font-size:11px;color:var(--text-dim);margin-bottom:3px"><strong>V'+(i+1)+':</strong> '+esc(a)+'</div>').join('')+'</div>';
+    // Notes
+    const notes=Array.isArray(k.notes)?k.notes:(k.notes?[{author:'Team',text:k.notes,date:''}]:[]);
+    h+='<div style="margin-top:14px"><div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--amber)">📝 Notities ('+notes.length+')</div>';
+    notes.forEach(n=>{const txt=typeof n==='string'?n:n.text;const auth=typeof n==='string'?'Team':(n.author||'Team');const dt=typeof n==='string'?'':(n.date?new Date(n.date).toLocaleDateString('nl-NL'):'');
+    h+='<div class="note-item"><div class="note-ava">👤</div><div><div class="note-meta">'+esc(auth)+(dt?' · '+dt:'')+'</div><div>'+esc(txt)+'</div></div></div>';});
+    h+='<div style="display:flex;gap:8px;margin-top:10px"><input class="fi" id="newNote" placeholder="Nieuwe notitie..." style="flex:1"><input class="fi" id="noteAuth" placeholder="Naam" style="max-width:100px"><button class="btn btn-p btn-s" onclick="addNote('+id+')">➕</button></div></div>';
+    if(k.history&&k.history.length)h+='<div style="margin-top:14px;font-size:11px;color:var(--text-muted)"><strong>📜 Geschiedenis:</strong><br>'+k.history.map(hi=>SN[hi.from]+' → '+SN[hi.to]+' ('+new Date(hi.date).toLocaleDateString('nl-NL')+')').join('<br>')+'</div>';
+    h+='<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-p" onclick="aiProfile('+k.id+')">🤖 AI Profiel</button><button class="btn btn-p" onclick="deepSearch('+k.id+')" style="background:var(--amber);color:#222">🔍 Deep Search</button><button class="btn btn-g" onclick="editK('+id+')">✏️ Bewerken</button></div>';
+    el('mBody').innerHTML=h;el('modalBg').style.display='flex';
+}
+function addNote(id){const k=S.kandidaten.find(x=>x.id===id);if(!k)return;const txt=el('newNote').value.trim();if(!txt)return;if(!Array.isArray(k.notes))k.notes=[];k.notes.push({author:el('noteAuth').value.trim()||'Team',text:txt,date:new Date().toISOString()});save();showKDetail(id);}
+function closeModal(e){if(!e||e.target===el('modalBg'))el('modalBg').style.display='none';}
+
+function renderBig5(b5){
+    const t=[{l:'Openheid',v:b5.openness,c:'var(--accent)'},{l:'Zorgvuldig',v:b5.conscientiousness,c:'var(--green)'},{l:'Extraversie',v:b5.extraversion,c:'var(--amber)'},{l:'Meegaand',v:b5.agreeableness,c:'var(--blue)'},{l:'Neuroticisme',v:b5.neuroticism,c:'var(--red)'}];
+    return '<div style="margin:14px 0"><div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text-dim)">BIG FIVE</div><div class="big5-bars">'+t.map(x=>'<div class="b5-row"><span class="b5-label">'+x.l+'</span><div class="b5-track"><div class="b5-fill" style="width:'+x.v+'%;background:'+x.c+'">'+x.v+'%</div></div><span class="b5-val">'+x.v+'</span></div>').join('')+'</div></div>';
+}
+
+// ── Show DNA ──
+function renderShowDNA(){
+    const dna=SHOW_DNA[S.showType];
+    if(!dna){el('dnaContent').innerHTML='<p style="font-size:12px;color:var(--text-dim)">Geen DNA template voor dit programma. Beschikbaar: De Verraders, Wie is de Mol, Expeditie Robinson, Big Brother, Temptation Island, The Traitors Int., The Mole Int., Love Island.</p>';return;}
+    const have={};ARCHETYPES.forEach(a=>{have[a]=0;});
+    S.kandidaten.filter(k=>k.stage==='shortlist'||k.stage==='pitched'||k.stage==='cast').forEach(k=>{if(k.archetype&&have[k.archetype]!==undefined)have[k.archetype]++;});
+    let h='<div style="font-size:13px;font-weight:600;margin-bottom:12px">'+esc(S.showType)+' — Ideale samenstelling</div><div class="dna-grid">';
+    ARCHETYPES.forEach(a=>{const need=dna[a]||0;const got=have[a]||0;if(need===0&&got===0)return;
+    h+='<div class="dna-slot '+(got>=need?'filled':'missing')+'"><div class="emoji">'+a.split(' ')[0]+'</div><div class="count">'+got+'/'+need+'</div><div class="label">'+a.split(' ').slice(1).join(' ')+'</div></div>';});
+    h+='</div>';
+    const total=ARCHETYPES.reduce((s,a)=>s+(dna[a]||0),0);
+    const filled=ARCHETYPES.reduce((s,a)=>s+Math.min(have[a]||0,dna[a]||0),0);
+    h+='<div style="margin-top:16px;display:flex;gap:12px;align-items:center"><div class="score-ring '+(filled>=total?'high':filled>=total*0.5?'mid':'low')+'">'+(total?Math.round(filled/total*100):0)+'%</div><div><div style="font-size:13px;font-weight:600">Cast Compleetheid</div><div style="font-size:11px;color:var(--text-dim)">'+filled+'/'+total+' posities gevuld (shortlist/pitched/cast)</div></div></div>';
+    if(filled===0){h+='<div style="margin-top:16px;padding:14px 16px;background:var(--surface-2);border:1px dashed var(--border);border-radius:8px;font-size:12px;color:var(--text-dim);line-height:1.7">💡 <strong>Waarom is alles leeg?</strong><br>Show DNA telt alleen kandidaten die:<br>• Een <strong>archetype</strong> toegewezen hebben (bij invoer of via AI Profiel)<br>• In fase <strong>Shortlist, Pitched of Gecast</strong> staan in de pipeline<br><br><strong>Stappen om te vullen:</strong><br>1. Ga naar <a href="#" onclick="showTab(\'kandidaten\');return false" style="color:var(--accent)">👥 Kandidaten</a> en draai een <strong>AI Profiel</strong> analyse<br>2. Verplaats kandidaten naar Shortlist via de <a href="#" onclick="showTab(\'pipeline\');return false" style="color:var(--accent)">📊 Pipeline</a><br>3. Kom hier terug om de compleetheid te zien groeien<br><br>💡 <em>Tip: De <strong>AI Optimizer</strong> (Kandidaten tab) stelt automatisch de ideale cast samen.</em></div>';}
+    el('dnaContent').innerHTML=h;
+}
+
+// ── Diversity ──
+function renderDiversity(){
+    if(!S.kandidaten.length){el('divContent').innerHTML='';el('divEmpty').style.display='block';return;}
+    el('divEmpty').style.display='none';
+    const colors=['var(--accent)','var(--green)','var(--amber)','var(--blue)','var(--pink)','var(--cyan)','var(--red)','#a78bfa','#fb923c'];
+    function bar(label,data){const tot=Object.values(data).reduce((a,b)=>a+b,0);if(!tot)return '';
+    return '<div class="div-row"><span class="div-label">'+label+'</span><div class="div-bar-bg">'+Object.entries(data).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>{const w=(v/tot*100).toFixed(1);return '<div class="div-seg" style="width:'+w+'%;background:'+colors[i%colors.length]+'" title="'+k+': '+v+'">'+(w>10?k+' '+v:'')+'</div>';}).join('')+'</div></div>';}
+    const genders={},ages={},archs={},stages={},bgs={};
+    S.kandidaten.forEach(k=>{genders[k.gender||'Onbekend']=(genders[k.gender||'Onbekend']||0)+1;const a=k.leeftijd?(k.leeftijd<25?'18-24':k.leeftijd<35?'25-34':k.leeftijd<45?'35-44':k.leeftijd<55?'45-54':'55+'):'Onbekend';ages[a]=(ages[a]||0)+1;archs[k.archetype||'Geen']=(archs[k.archetype||'Geen']||0)+1;stages[SN[k.stage]]=(stages[SN[k.stage]]||0)+1;bgs[k.achtergrond||'Onbekend']=(bgs[k.achtergrond||'Onbekend']||0)+1;});
+    el('divContent').innerHTML='<div style="font-size:13px;font-weight:600;margin-bottom:14px">Samenstelling — '+S.kandidaten.length+' kandidaten</div>'+bar('Gender',genders)+bar('Leeftijd',ages)+bar('Archetype',archs)+bar('Achtergrond',bgs)+bar('Pipeline',stages);
+}
+
+// ── EQ Test ──
+function renderEQTargets(){if(el('eqTarget'))el('eqTarget').innerHTML='<option value="">— Kies kandidaat —</option>'+S.kandidaten.map(k=>'<option value="'+k.id+'">'+esc(k.naam)+'</option>').join('');}
+function showEQTest(){
+    const tid=el('eqTarget').value;const k=tid?S.kandidaten.find(x=>x.id==tid):null;
+    let h='<div class="card fade"><div class="card-title"><span class="ic" style="background:var(--pink-dim)">🧠</span> EQ Test'+(k?' — '+esc(k.naam):'')+'</div>';
+    EQ_QS.forEach((q,i)=>{h+='<div class="eq-q"><h4>'+(i+1)+'. '+q.q+'</h4><div class="eq-opts">'+q.o.map(o=>'<button class="eq-opt" data-qi="'+i+'" onclick="pickEQ(this,'+i+',this.textContent)">'+o+'</button>').join('')+'</div></div>';});
+    h+='<button class="btn btn-p btn-l" style="margin-top:14px" onclick="submitEQ('+(tid||'null')+')">✅ Opslaan Antwoorden</button></div>';
+    el('eqPreview').innerHTML=h;
+}
+function pickEQ(btn,qi,ans){document.querySelectorAll('[data-qi="'+qi+'"]').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');eqAnswers[qi]=ans;}
+function submitEQ(kid){
+    const answers=EQ_QS.map((_,i)=>eqAnswers[i]||'Niet beantwoord');
+    if(kid){const k=S.kandidaten.find(x=>x.id===kid);if(k){k.eqAnswers=answers;save();}}
+    alert('✅ EQ Test opgeslagen!'+(kid?' Gekoppeld aan profiel.':''));eqAnswers={};el('eqPreview').innerHTML='';
+}
+function generateEQLink(){
+    const base=window.location.href.split('?')[0];
+    el('eqLinkOut').innerHTML='<div style="background:var(--surface-2);padding:12px;border-radius:7px;margin-top:10px"><p style="font-size:12px;color:var(--text-dim);margin-bottom:8px">🔗 Stuur deze link naar kandidaten:</p><div style="display:flex;gap:8px"><input class="fi" id="eqLink" value="'+base+'?eq=1" readonly style="font-size:11px"><button class="btn btn-g btn-s" onclick="navigator.clipboard.writeText(el(\'eqLink\').value);this.textContent=\'✅ Gekopieerd!\'">📋 Kopieer</button></div><p style="font-size:11px;color:var(--amber);margin-top:8px">⚠️ Let op: Kandidaten vullen de test in op hun eigen apparaat. Antwoorden worden lokaal opgeslagen op hun apparaat. Zij moeten een screenshot of de antwoorden handmatig terugsturen. Een backend is nodig voor automatische terugkoppeling.</p></div>';
+}
+
+// ── Scenario ──
+function setScenario(text){el('scenarioInput').value=text;}
+
+// ── API ──
+function saveKey(){const k=el('apiKeyIn').value.trim();if(!k){localStorage.removeItem('cm3_key');}else if(!k.startsWith('sk-ant-')){el('keyStat').textContent='⚠️ Moet beginnen met sk-ant-';el('keyStat').style.color='var(--red)';return;}else{localStorage.setItem('cm3_key',k);el('keyStat').textContent='✅ Opgeslagen!';el('keyStat').style.color='var(--green)';}updateApiPill();updateAll();}
+function saveModel(){localStorage.setItem('cm3_model',el('modelSel').value);}
+function toggleKey(){const i=el('apiKeyIn');i.type=i.type==='password'?'text':'password';}
+function updateApiPill(){const k=getKey();el('apiDot').className='dot'+(k?' on':'');el('apiLabel').textContent=k?'Verbonden':'Niet verbonden';}
+
+async function callAI(prompt,system){
+    const key=getKey();if(!key){alert('Stel je API key in bij ⚙️');showTab('settings');return null;}
+    let r;
+    try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:getModel(),max_tokens:4096,system,messages:[{role:'user',content:prompt}]})});
+    }catch(netErr){throw new Error('Geen internetverbinding of netwerk fout. Controleer je verbinding en probeer opnieuw.');}
+    if(!r.ok){const status=r.status;const body=await r.text().catch(()=>'');if(status===401)throw new Error('Ongeldige API key. Controleer je key bij ⚙️ Instellingen.');if(status===429)throw new Error('Rate limit bereikt. Wacht even en probeer opnieuw (±30 sec).');if(status===529)throw new Error('Anthropic API is overbelast. Probeer het over een paar minuten opnieuw.');if(status>=500)throw new Error('Anthropic server fout ('+status+'). Probeer opnieuw.');throw new Error('API fout '+status+': '+body.substring(0,150));}
+    const d=await r.json();return d.content.map(c=>c.text||'').join('');
+}
+function getSelected(){return S.kandidaten.filter(k=>S.selected.has(k.id));}
+function kInfo(k){return k.naam+' ('+( k.leeftijd||'?')+'j, '+(k.beroep||'onbekend')+', '+(k.gender||'?')+') ['+(k.archetype||'geen')+']\nBeschrijving: '+k.desc+(k.eqAnswers?'\nEQ: '+k.eqAnswers.join(', '):'');}
+const SYS_NL='Je bent een senior casting director en groepsdynamiek psycholoog voor Nederlandse reality TV. Combineer Big Five en EQ met TV-ervaring. Schrijf in het Nederlands. Gebruik ### headers. Noem kandidaten bij naam.';
+
+// ── AI Profile ──
+async function aiProfile(id){
+    const k=S.kandidaten.find(x=>x.id===id);if(!k)return;
+    el('mTitle').textContent='🤖 '+k.naam;el('mBody').innerHTML='<div class="ld"><div class="sp"></div>Profiel genereren...</div>';el('modalBg').style.display='flex';
+    try{const r=await callAI('Analyseer voor "'+S.showType+'":\n\n'+kInfo(k)+'\n\nGeef:\n1. PERSOONLIJKHEIDSANALYSE met Big Five scores (0-100)\n2. EMOTIONELE INTELLIGENTIE\n3. TV-POTENTIEEL\n4. VERWACHT GEDRAG\n5. CASTING ADVIES\n\nGeef ook: BIG5_JSON:{"openness":XX,"conscientiousness":XX,"extraversion":XX,"agreeableness":XX,"neuroticism":XX}',SYS_NL);
+    if(!r){closeModal();return;}
+    const m=r.match(/BIG5_JSON:\s*(\{.*?\})/);if(m){try{k.big5=JSON.parse(m[1]);k.castScore=calcScore(k);save();}catch(e){}}
+    el('mBody').innerHTML='<div class="result-box">'+fmt(r.replace(/BIG5_JSON:\s*\{.*?\}/g,''))+'</div>'+(k.big5?renderBig5(k.big5):'');
+    S.analyses++;save();updateAll();
+    }catch(e){el('mBody').innerHTML='<p style="color:var(--red)">❌ '+e.message+'</p>';}
+}
+
+// ── Bulk Analyse ──
+async function bulkAnalyse(){
+    const list=S.kandidaten.filter(k=>!k.big5);if(!list.length)return alert('Alle kandidaten hebben al een profiel!');
+    if(!getKey())return alert('Stel eerst je API key in.');
+    if(!confirm(list.length+' kandidaten analyseren?'))return;
+    el('bulkProgress').style.display='block';let errors=0;
+    for(let i=0;i<list.length;i++){
+        el('bulkLabel').textContent='Analyseren: '+list[i].naam+'...'+(errors?' ('+errors+' fouten)':'');el('bulkCount').textContent=(i+1)+'/'+list.length;el('bulkFill').style.width=((i+1)/list.length*100)+'%';
+        try{const r=await callAI('Analyseer kort: '+kInfo(list[i])+'\n\nGeef ALLEEN: BIG5_JSON:{"openness":XX,"conscientiousness":XX,"extraversion":XX,"agreeableness":XX,"neuroticism":XX}','Geef ALLEEN BIG5_JSON.');
+        if(!r){errors++;continue;}
+        const m=r.match(/BIG5_JSON:\s*(\{.*?\})/);if(m){try{list[i].big5=JSON.parse(m[1]);list[i].castScore=calcScore(list[i]);save();}catch(e){errors++;}}else{errors++;}
+        }catch(e){errors++;console.error(e);}await new Promise(r=>setTimeout(r,500));
+    }el('bulkProgress').style.display='none';updateAll();alert('✅ Bulk analyse compleet!'+(errors?' '+errors+' van '+list.length+' gefaald.':''));
+}
+
+// ── Group Analysis ──
+async function runGroupAnalysis(){
+    const sel=getSelected();if(sel.length<3)return;el('analyseEmpty').style.display='none';
+    el('analyseOut').innerHTML='<div class="card fade"><div class="ld"><div class="sp"></div>Groepsanalyse van '+sel.length+' kandidaten...</div></div>';
+    try{const r=await callAI('Analyseer '+sel.length+' kandidaten voor "'+S.showType+'":\n\n'+sel.map((k,i)=>(i+1)+'. '+kInfo(k)).join('\n\n')+'\n\nGeef:\n### GROEPSDYNAMIEK\n### ALLIANTIES & CONFLICTEN\n### TOP 3 EXPLOSIEVE COMBINATIES (drama /10)\n### ROL-TOEWIJZING\n### IDEALE SELECTIE\n### WAT ONTBREEKT\n### DRAMA VOORSPELLING',SYS_NL);
+    if(!r)return;
+    el('analyseOut').innerHTML='<div class="card fade"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="card-title"><span class="ic" style="background:var(--accent-glow)">🤖</span> Resultaat — '+S.showType+'</div><button class="btn btn-g btn-s" onclick="exportText(document.getElementById(\'gaT\').innerText)">📥</button></div><div class="result-box" id="gaT">'+fmt(r)+'</div></div>';
+    S.analyses++;save();
+    }catch(e){el('analyseOut').innerHTML='<div class="card"><p style="color:var(--red)">❌ '+e.message+'</p></div>';}
+}
+
+// ── Matrix ──
+async function runMatrix(){
+    const sel=getSelected();if(sel.length<3)return;el('matrixEmpty').style.display='none';
+    el('matrixOut').innerHTML='<div class="card fade"><div class="ld"><div class="sp"></div>Matrix voor '+sel.length+' kandidaten...</div></div>';
+    try{const r=await callAI('Kandidaten voor "'+S.showType+'":\n\n'+sel.map((k,i)=>(i+1)+'. '+kInfo(k)).join('\n\n')+'\n\nGeef voor ELKE combinatie conflict score (1-10) en reden (max 15 woorden).\nALLEEN JSON: {"pairs":[{"a":"Naam1","b":"Naam2","score":7,"reden":"Uitleg"}]}','Geef ALLEEN valid JSON.');
+    let data;try{data=JSON.parse(r.replace(/```json|```/g,'').trim());}catch(e){throw new Error('Geen geldig JSON.');}
+    const lu={},names=sel.map(k=>k.naam);(data.pairs||[]).forEach(p=>{lu[p.a+'|'+p.b]=p;lu[p.b+'|'+p.a]={...p,a:p.b,b:p.a};});
+    let t='<div class="card fade"><div class="card-title"><span class="ic" style="background:var(--pink-dim)">🔗</span> Matrix</div><div style="overflow-x:auto"><table class="matrix-table"><tr><th></th>'+names.map(n=>'<th>'+esc(n)+'</th>').join('')+'</tr>';
+    names.forEach(n1=>{t+='<tr><th style="text-align:left">'+esc(n1)+'</th>';names.forEach(n2=>{if(n1===n2){t+='<td class="mx-self">—</td>';return;}const p=lu[n1+'|'+n2];const sc=p?p.score:'?';t+='<td class="'+(sc>=7?'mx-high':sc>=4?'mx-med':'mx-low')+'" title="'+(p?esc(p.reden):'')+'">'+sc+'</td>';});t+='</tr>';});
+    t+='</table></div>';
+    const sorted=(data.pairs||[]).sort((a,b)=>b.score-a.score);
+    if(sorted.length){t+='<div style="margin-top:16px"><div style="font-size:13px;font-weight:600;margin-bottom:8px">🔥 Hoogste Spanning</div>';sorted.slice(0,5).forEach(p=>{t+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px"><span class="tag tag-r">'+p.score+'/10</span><strong>'+esc(p.a)+' ↔ '+esc(p.b)+'</strong> — '+esc(p.reden)+'</div>';});t+='</div>';}
+    t+='</div>';el('matrixOut').innerHTML=t;S.analyses++;save();
+    }catch(e){el('matrixOut').innerHTML='<div class="card"><p style="color:var(--red)">❌ '+e.message+'</p><button class="btn btn-p" style="margin-top:8px" onclick="runMatrix()">Opnieuw</button></div>';}
+}
+
+// ── Compare ──
+async function runCompare(){
+    const sel=getSelected();if(sel.length<2||sel.length>3)return;
+    el('compOut').innerHTML='<div class="card fade"><div class="ld"><div class="sp"></div>Vergelijking...</div></div>';
+    try{const r=await callAI('Vergelijk voor "'+S.showType+'":\n\n'+sel.map((k,i)=>(i+1)+'. '+kInfo(k)).join('\n\n')+'\n\n### VERGELIJKING per criterium\n### WIE PAST BETER\n### WANNEER KIES JE WIE',SYS_NL);
+    if(!r)return;
+    el('compOut').innerHTML='<div class="card fade"><div class="result-box">'+fmt(r)+'</div></div>';S.analyses++;save();
+    }catch(e){el('compOut').innerHTML='<div class="card"><p style="color:var(--red)">❌ '+e.message+'</p></div>';}
+}
+
+// ── Scenario ──
+async function runScenario(){
+    const sel=getSelected(),sc=el('scenarioInput').value.trim();if(sel.length<2||!sc)return alert('Selecteer kandidaten en beschrijf scenario.');
+    el('scenarioOut').innerHTML='<div class="card fade"><div class="ld"><div class="sp"></div>Simuleren...</div></div>';
+    try{const r=await callAI('Kandidaten in "'+S.showType+'":\n\n'+sel.map((k,i)=>(i+1)+'. '+kInfo(k)).join('\n\n')+'\n\nSCENARIO: '+sc+'\n\nPer kandidaat: reactie, strategie, quote, impact.\n\n### HOE DIT ERUIT ZIET OP TV',SYS_NL);
+    if(!r)return;
+    el('scenarioOut').innerHTML='<div class="card fade"><div class="result-box">'+fmt(r)+'</div></div>';S.analyses++;save();
+    }catch(e){el('scenarioOut').innerHTML='<div class="card"><p style="color:var(--red)">❌ '+e.message+'</p></div>';}
+}
+
+// ── AI Chat ──
+function scrollChat(){const m=el('chatMsgs');if(m)m.scrollTop=m.scrollHeight;}
+function renderChatHistory(){
+    const msgs=el('chatMsgs');if(!msgs)return;
+    msgs.innerHTML='<div class="chat-msg ai"><div class="bubble">Hoi! Stel me vragen over je kandidatenpool, casting strategie, of groepsdynamiek.</div></div>';
+    chatHistory.forEach(m=>{msgs.innerHTML+='<div class="chat-msg '+(m.role==='user'?'user':'ai')+'"><div class="bubble">'+(m.role==='user'?esc(m.content):fmt(m.content))+'</div></div>';});
+    scrollChat();
+}
+function clearChat(){chatHistory=[];localStorage.setItem('cm3_chat_'+currentProject,'[]');el('chatMsgs').innerHTML='<div class="chat-msg ai"><div class="bubble">Chat gewist. Stel een nieuwe vraag!</div></div>';}
+async function sendChat(){
+    const input=el('chatInput'),msg=input.value.trim();if(!msg)return;
+    const key=getKey();if(!key){alert('Stel je API key in bij ⚙️');showTab('settings');return;}
+    input.value='';
+    chatHistory.push({role:'user',content:msg});
+    el('chatMsgs').innerHTML+='<div class="chat-msg user"><div class="bubble">'+esc(msg)+'</div></div>';
+    el('chatMsgs').innerHTML+='<div class="chat-msg ai" id="chatLd"><div class="bubble"><div class="ld" style="padding:0"><div class="sp"></div> Denken...</div></div></div>';scrollChat();
+    const ctx='Je hebt '+S.kandidaten.length+' kandidaten voor "'+S.showType+'":\n\n'+S.kandidaten.map(k=>'- '+k.naam+' ('+( k.leeftijd||'?')+'j, '+(k.beroep||'?')+', '+(k.archetype||'?')+') ['+SN[k.stage]+']'+(k.big5?' O'+k.big5.openness+'/C'+k.big5.conscientiousness+'/E'+k.big5.extraversion+'/A'+k.big5.agreeableness+'/N'+k.big5.neuroticism:'')).join('\n');
+    try{
+    const messages=[];
+    // Bouw conversatie: altijd user-first, max 10 berichten
+    const recent=chatHistory.slice(-10);
+    // Zorg dat messages altijd begint met user role (API vereist dit)
+    let startIdx=0;
+    while(startIdx<recent.length&&recent[startIdx].role==='assistant')startIdx++;
+    const validRecent=recent.slice(startIdx);
+    if(!validRecent.length){messages.push({role:'user',content:ctx+'\n\nVraag: '+msg});}
+    else{
+        validRecent.forEach((m,i)=>{
+            let content=m.content;
+            if(i===0&&m.role==='user')content=ctx+'\n\nVraag: '+content;
+            messages.push({role:m.role==='assistant'?'assistant':'user',content});
+        });
+    }
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:getModel(),max_tokens:4096,system:SYS_NL+' Houd antwoorden kort.',messages})});
+    if(!resp.ok){const status=resp.status;if(status===429)throw new Error('Rate limit — wacht even.');if(status===401)throw new Error('Ongeldige API key.');if(status===529)throw new Error('API overbelast — probeer later.');throw new Error('API fout '+status);}
+    const d=await resp.json();const r=d.content.map(c=>c.text||'').join('');
+    chatHistory.push({role:'assistant',content:r});localStorage.setItem('cm3_chat_'+currentProject,JSON.stringify(chatHistory));
+    const ld=document.getElementById('chatLd');if(ld)ld.remove();
+    el('chatMsgs').innerHTML+='<div class="chat-msg ai"><div class="bubble">'+fmt(r)+'</div></div>';scrollChat();
+    }catch(e){const ld=document.getElementById('chatLd');if(ld)ld.remove();
+    // Verwijder het gefaalde user bericht uit history zodat het niet corrupt raakt
+    if(chatHistory.length&&chatHistory[chatHistory.length-1].role==='user')chatHistory.pop();
+    el('chatMsgs').innerHTML+='<div class="chat-msg ai"><div class="bubble" style="color:var(--red)">❌ '+e.message+'</div></div>';scrollChat();}
+}
+
+// ── Export ──
+function exportPitchSheets(){
+    if(!S.kandidaten.length)return alert('Geen kandidaten.');
+    let t='CASTMATCH PRO v3 — PITCH SHEETS\nProgramma: '+S.showType+'\nDatum: '+new Date().toLocaleDateString('nl-NL')+'\n'+'═'.repeat(60)+'\n\n';
+    S.kandidaten.forEach((k,i)=>{t+='KANDIDAAT '+(i+1)+': '+k.naam+'\n'+'─'.repeat(40)+'\nLeeftijd: '+(k.leeftijd||'Onbekend')+'\nBeroep: '+(k.beroep||'Onbekend')+'\nGender: '+(k.gender||'Onbekend')+'\nArchetype: '+(k.archetype||'N/A')+'\nPipeline: '+SN[k.stage]+'\n';
+    if(k.insta)t+='Instagram: '+k.insta+'\n';if(k.video)t+='Video: '+k.video+'\n';
+    t+='\n'+k.desc+'\n';if(k.big5)t+='\nBig Five: O='+k.big5.openness+' C='+k.big5.conscientiousness+' E='+k.big5.extraversion+' A='+k.big5.agreeableness+' N='+k.big5.neuroticism+'\n';
+    if(k.castScore)t+='Score: '+k.castScore.total+'/100\n';t+='\n'+'═'.repeat(60)+'\n\n';});
+    exportText(t,'pitch-sheets');
+}
+function exportPDF(){generateReport('pdf');}
+function exportProducentPDF(){generateReport('pdf');}
+
+// ── Rapport Helper Functies ──
+function toggleRptStages(all){document.querySelectorAll('.rpt-stage-cb').forEach(cb=>cb.checked=all);updateRptCount();}
+function rptSelectAll(on){document.querySelectorAll('#tc-rapport input[type="checkbox"]').forEach(cb=>cb.checked=on);updateRptCount();}
+function updateRptCount(){
+    const stages=[];document.querySelectorAll('.rpt-stage-cb:checked').forEach(cb=>stages.push(cb.value));
+    const count=S.kandidaten.filter(k=>stages.includes(k.stage)).length;
+    const ct=el('rptKCount');if(ct)ct.textContent=count+' van '+S.kandidaten.length+' kandidaten geselecteerd';
+}
+function getRptOpt(id){const cb=el(id);return cb?cb.checked:false;}
+
+function generateReport(format){
+    if(!S.kandidaten.length)return alert('Geen kandidaten.');
+    // Gather options
+    const opt={cover:getRptOpt('rpt_cover'),pipeline:getRptOpt('rpt_pipeline'),gender:getRptOpt('rpt_gender'),archetype:getRptOpt('rpt_archetype'),showdna:getRptOpt('rpt_showdna'),diversity:getRptOpt('rpt_diversity'),photo:getRptOpt('rpt_photo'),basic:getRptOpt('rpt_basic'),desc:getRptOpt('rpt_desc'),big5:getRptOpt('rpt_big5'),score:getRptOpt('rpt_score'),social:getRptOpt('rpt_social'),video:getRptOpt('rpt_video'),eq:getRptOpt('rpt_eq'),notes:getRptOpt('rpt_notes'),history:getRptOpt('rpt_history'),group:getRptOpt('rpt_group'),matrix:getRptOpt('rpt_matrix'),compare:getRptOpt('rpt_compare'),scenario:getRptOpt('rpt_scenario')};
+    // Gather stage filter
+    const stages=[];document.querySelectorAll('.rpt-stage-cb:checked').forEach(cb=>stages.push(cb.value));
+    const filtered=S.kandidaten.filter(k=>stages.includes(k.stage));
+    if(!filtered.length)return alert('Geen kandidaten in de geselecteerde fases.');
+
+    const today=new Date().toLocaleDateString('nl-NL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    const proj=projects.find(p=>p.id===currentProject);
+    const projName=proj?proj.name:'CastMatch Pro';
+    const total=filtered.length;
+    const analyzed=filtered.filter(k=>k.big5).length;
+    const avgScore=filtered.filter(k=>k.castScore).length?Math.round(filtered.filter(k=>k.castScore).reduce((s,k)=>s+k.castScore.total,0)/filtered.filter(k=>k.castScore).length):0;
+    const genders={};filtered.forEach(k=>{const g=k.gender||'Onbekend';genders[g]=(genders[g]||0)+1;});
+    const archs={};filtered.forEach(k=>{if(k.archetype)archs[k.archetype]=(archs[k.archetype]||0)+1;});
+    const stageCount={};STAGES.forEach(s=>stageCount[s]=0);filtered.forEach(k=>stageCount[k.stage]=(stageCount[k.stage]||0)+1);
+    const dna=SHOW_DNA[S.showType];
+    let dnaTotal=0,dnaFilled=0;
+    if(dna){Object.values(dna).forEach(v=>dnaTotal+=v);const advanced=filtered.filter(k=>['shortlist','pitched','cast'].includes(k.stage));Object.entries(dna).forEach(([arch,need])=>{const have=Math.min(advanced.filter(x=>x.archetype===arch).length,need);dnaFilled+=have;});}
+    // Age stats
+    const ages=filtered.map(k=>parseInt(k.leeftijd)).filter(a=>!isNaN(a));
+    const ageMin=ages.length?Math.min(...ages):0;const ageMax=ages.length?Math.max(...ages):0;const ageAvg=ages.length?Math.round(ages.reduce((s,a)=>s+a,0)/ages.length):0;
+    const ageBuckets={'18-25':0,'26-35':0,'36-45':0,'46-55':0,'56+':0};
+    ages.forEach(a=>{if(a<=25)ageBuckets['18-25']++;else if(a<=35)ageBuckets['26-35']++;else if(a<=45)ageBuckets['36-45']++;else if(a<=55)ageBuckets['46-55']++;else ageBuckets['56+']++;});
+
+    const css=`*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;background:#fff;padding:0;line-height:1.5}
+    .cover{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);color:white;padding:80px 60px;min-height:100vh;display:flex;flex-direction:column;justify-content:center;page-break-after:always}
+    .cover h1{font-size:42px;font-weight:800;margin-bottom:8px;letter-spacing:-1px}.cover .sub{font-size:22px;opacity:.8;margin-bottom:40px;font-weight:300}
+    .cover .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:500px}.cover .meta-item{background:rgba(255,255,255,.1);border-radius:10px;padding:16px 20px}
+    .cover .meta-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;opacity:.6;margin-bottom:4px}.cover .meta-val{font-size:24px;font-weight:700}
+    .cover .footer{margin-top:auto;padding-top:40px;font-size:12px;opacity:.5}
+    .page{padding:40px 50px;max-width:900px;margin:0 auto}
+    h2{font-size:20px;font-weight:700;color:#1a1a2e;margin:30px 0 16px;padding-bottom:8px;border-bottom:3px solid #7c5cfc}
+    h3{font-size:15px;font-weight:600;color:#7c5cfc;margin:20px 0 10px}
+    .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+    .summary-card{background:#f8f7ff;border:1px solid #e8e5ff;border-radius:10px;padding:16px;text-align:center}
+    .summary-card .num{font-size:28px;font-weight:800;color:#7c5cfc}.summary-card .lbl{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+    .pipeline-bar{display:flex;margin:12px 0 20px;border-radius:8px;overflow:hidden;height:32px;background:#f0f0f0}
+    .pipeline-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:white;min-width:30px}
+    .dist-row{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:12px}.dist-label{width:90px;font-weight:500}.dist-bar-wrap{flex:1;height:14px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+    .dist-bar-fill{height:100%;border-radius:4px}.dist-val{width:40px;text-align:right;font-weight:600;font-size:11px}
+    .k-card{border:1px solid #e0e0e0;border-radius:12px;padding:20px;margin:16px 0;page-break-inside:avoid;position:relative;overflow:hidden}
+    .k-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%}
+    .k-card.high::before{background:#22c55e}.k-card.mid::before{background:#eab308}.k-card.low::before{background:#ef4444}.k-card.none::before{background:#ccc}
+    .k-header{display:flex;gap:16px;align-items:flex-start;margin-bottom:12px}
+    .k-photo{width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #e8e5ff;flex-shrink:0}
+    .k-photo-placeholder{width:72px;height:72px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .k-name{font-size:20px;font-weight:700;margin-bottom:2px}.k-meta{font-size:12px;color:#666}
+    .k-tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+    .k-tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600}
+    .k-tag-arch{background:#f0ecff;color:#7c5cfc}.k-tag-stage{background:#ecfdf5;color:#059669}
+    .k-score-badge{position:absolute;top:16px;right:16px;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:white}
+    .k-desc{font-size:13px;color:#444;margin:10px 0;line-height:1.6;padding:10px 14px;background:#fafafa;border-radius:8px;border-left:3px solid #e8e5ff}
+    .b5-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0}
+    .b5-item{text-align:center;padding:8px;background:#fafafa;border-radius:8px}.b5-item .b5-ring{width:44px;height:44px;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700}
+    .b5-item .b5-name{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+    .k-details{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;font-size:12px}
+    .k-detail{display:flex;gap:6px}.k-detail-label{color:#999;min-width:70px}.k-detail-val{color:#333;font-weight:500}
+    .k-notes{margin:10px 0;padding:10px;background:#fffbeb;border-radius:8px;border:1px solid #fde68a;font-size:12px}
+    .k-notes-title{font-weight:600;font-size:11px;color:#92400e;margin-bottom:6px}
+    .k-note-item{margin:4px 0;padding-left:8px;border-left:2px solid #fbbf24;font-size:11px}
+    .k-history{margin:8px 0;font-size:10px;color:#999}.k-history span{background:#f0f0f0;padding:1px 6px;border-radius:4px;margin:0 2px}
+    .dna-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+    .dna-item{text-align:center;padding:10px;border-radius:8px;border:1px solid #e0e0e0}.dna-item.filled{background:#ecfdf5;border-color:#86efac}.dna-item.partial{background:#fffbeb;border-color:#fde68a}.dna-item.empty{background:#fef2f2;border-color:#fecaca}
+    .dna-emoji{font-size:20px}.dna-count{font-size:14px;font-weight:700;margin:2px 0}.dna-name{font-size:10px;color:#666}
+    .ai-section{background:#f8f7ff;border:1px solid #e8e5ff;border-radius:10px;padding:20px;margin:16px 0;page-break-inside:avoid}
+    .ai-section h3{margin-top:0}
+    .confidential{text-align:center;font-size:10px;color:#999;border-top:1px solid #eee;padding-top:16px;margin-top:30px}
+    @media print{.cover{min-height:auto;padding:60px 40px}.page{padding:20px 30px}.k-card{break-inside:avoid}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
+
+    let html='<html><head><meta charset="UTF-8"><title>'+esc(projName)+' — Casting Rapport</title><style>'+css+'</style></head><body>';
+
+    // ── COVER PAGE ──
+    if(opt.cover){
+        html+='<div class="cover">';
+        html+='<div style="font-size:13px;letter-spacing:3px;text-transform:uppercase;opacity:.5;margin-bottom:20px">Casting Rapport</div>';
+        html+='<h1>'+esc(S.showType)+'</h1>';
+        html+='<div class="sub">'+esc(projName)+'</div>';
+        html+='<div class="meta-grid">';
+        html+='<div class="meta-item"><div class="meta-label">Kandidaten</div><div class="meta-val">'+total+'</div></div>';
+        html+='<div class="meta-item"><div class="meta-label">Geanalyseerd</div><div class="meta-val">'+analyzed+'/'+total+'</div></div>';
+        html+='<div class="meta-item"><div class="meta-label">Gem. Score</div><div class="meta-val">'+(avgScore||'–')+'</div></div>';
+        html+='<div class="meta-item"><div class="meta-label">Cast Compleet</div><div class="meta-val">'+(dnaTotal?Math.round(dnaFilled/dnaTotal*100)+'%':'–')+'</div></div>';
+        html+='</div>';
+        html+='<div class="footer">Gegenereerd door CastMatch Pro — FS Productions<br>'+today+'<br>VERTROUWELIJK</div>';
+        html+='</div>';
+    }
+
+    // ── OVERZICHT ──
+    const hasOverview=opt.pipeline||opt.gender||opt.archetype||opt.showdna||opt.diversity;
+    if(hasOverview){
+        html+='<div class="page">';
+        html+='<h2>📊 Casting Overzicht</h2>';
+
+        if(opt.pipeline){
+            html+='<h3>Pipeline Verdeling</h3>';
+            const stageColors={intake:'#94a3b8',screening:'#7c5cfc',interview:'#3b82f6',shortlist:'#eab308',pitched:'#f97316',cast:'#22c55e'};
+            html+='<div class="pipeline-bar">';
+            STAGES.forEach(s=>{const pct=total?Math.max((stageCount[s]/total*100),stageCount[s]?5:0):0;
+            if(stageCount[s])html+='<div class="pipeline-seg" style="width:'+pct+'%;background:'+stageColors[s]+'">'+SN[s]+' ('+stageCount[s]+')</div>';});
+            html+='</div>';
+            html+='<div class="summary-grid">';
+            STAGES.forEach(s=>{if(stageCount[s])html+='<div class="summary-card"><div class="num" style="color:'+(stageColors[s]||'#7c5cfc')+'">'+stageCount[s]+'</div><div class="lbl">'+SN[s]+'</div></div>';});
+            html+='</div>';
+        }
+
+        if(opt.gender){
+            html+='<h3>Gender Verdeling</h3>';
+            const gColors={'Man':'#3b82f6','Vrouw':'#ec4899','Non-binair':'#a855f7','Onbekend':'#94a3b8'};
+            Object.entries(genders).forEach(([g,c])=>{const pct=Math.round(c/total*100);
+            html+='<div class="dist-row"><div class="dist-label">'+esc(g)+'</div><div class="dist-bar-wrap"><div class="dist-bar-fill" style="width:'+pct+'%;background:'+(gColors[g]||'#94a3b8')+'"></div></div><div class="dist-val">'+c+' ('+pct+'%)</div></div>';});
+        }
+
+        if(opt.archetype&&Object.keys(archs).length){
+            html+='<h3>Archetype Verdeling</h3>';
+            Object.entries(archs).sort((a,b)=>b[1]-a[1]).forEach(([a,c])=>{const pct=Math.round(c/total*100);
+            html+='<div class="dist-row"><div class="dist-label" style="width:130px">'+esc(a)+'</div><div class="dist-bar-wrap"><div class="dist-bar-fill" style="width:'+pct+'%;background:#7c5cfc"></div></div><div class="dist-val">'+c+' ('+pct+'%)</div></div>';});
+        }
+
+        if(opt.diversity&&ages.length){
+            html+='<h3>Leeftijdsverdeling</h3>';
+            html+='<p style="font-size:12px;color:#666;margin-bottom:8px">Range: '+ageMin+'–'+ageMax+' jaar | Gemiddeld: '+ageAvg+' jaar</p>';
+            Object.entries(ageBuckets).forEach(([range,c])=>{if(c){const pct=Math.round(c/ages.length*100);
+            html+='<div class="dist-row"><div class="dist-label">'+range+'</div><div class="dist-bar-wrap"><div class="dist-bar-fill" style="width:'+pct+'%;background:#7c5cfc"></div></div><div class="dist-val">'+c+' ('+pct+'%)</div></div>';}});
+        }
+
+        if(opt.showdna&&dna){
+            html+='<h3>Show DNA — '+esc(S.showType)+'</h3>';
+            html+='<div class="dna-grid">';
+            const advanced=filtered.filter(k=>['shortlist','pitched','cast'].includes(k.stage));
+            Object.entries(dna).forEach(([arch,need])=>{
+                const have=advanced.filter(k=>k.archetype===arch).length;
+                const cls=have>=need?'filled':have>0?'partial':'empty';
+                html+='<div class="dna-item '+cls+'"><div class="dna-emoji">'+arch.split(' ')[0]+'</div><div class="dna-count">'+have+'/'+need+'</div><div class="dna-name">'+esc(arch.replace(/^[^\s]+\s/,''))+'</div></div>';
+            });
+            html+='</div>';
+        }
+        html+='</div>';
+    }
+
+    // ── AI ANALYSES ──
+    const aiContent=[];
+    if(opt.group){const t=el('analyseOut')?.querySelector('.result-box');if(t)aiContent.push({title:'🤖 Groepsanalyse',html:t.innerHTML});}
+    if(opt.matrix){const t=el('matrixOut');if(t&&t.innerHTML.trim())aiContent.push({title:'🔗 Relatie & Conflict Matrix',html:t.innerHTML});}
+    if(opt.compare){const t=el('compOut')?.querySelector('.result-box');if(t)aiContent.push({title:'⚖️ Vergelijkingsanalyse',html:t.innerHTML});}
+    if(opt.scenario){const t=el('scenarioOut')?.querySelector('.result-box');if(t)aiContent.push({title:'🎭 Scenario Simulatie',html:t.innerHTML});}
+
+    if(aiContent.length){
+        html+='<div class="page">';
+        html+='<h2>🤖 AI Analyses</h2>';
+        aiContent.forEach(ai=>{
+            html+='<div class="ai-section"><h3>'+ai.title+'</h3><div style="font-size:13px;line-height:1.7">'+ai.html+'</div></div>';
+        });
+        html+='</div>';
+    }
+
+    // ── KANDIDATEN ──
+    html+='<div class="page">';
+    html+='<h2>👥 Kandidaten — Gedetailleerd ('+total+')</h2>';
+    const sorted=[...filtered].sort((a,b)=>STAGES.indexOf(b.stage)-STAGES.indexOf(a.stage));
+    let lastStage='';
+    sorted.forEach(k=>{
+        if(k.stage!==lastStage){html+='<h3 style="margin-top:28px">'+SN[k.stage]+' ('+stageCount[k.stage]+')</h3>';lastStage=k.stage;}
+        const sc=k.castScore;
+        const tier=sc?(sc.total>=70?'high':sc.total>=40?'mid':'low'):'none';
+        html+='<div class="k-card '+tier+'">';
+
+        if(opt.score&&sc){const bg=sc.total>=70?'#22c55e':sc.total>=40?'#eab308':'#ef4444';
+        html+='<div class="k-score-badge" style="background:'+bg+'">'+sc.total+'</div>';}
+
+        html+='<div class="k-header">';
+        if(opt.photo){
+            if(k.photo)html+='<img class="k-photo" src="'+k.photo+'">';
+            else html+='<div class="k-photo-placeholder">👤</div>';
+        }
+        html+='<div>';
+        if(opt.basic){
+            html+='<div class="k-name">'+esc(k.naam)+'</div>';
+            html+='<div class="k-meta">'+(k.leeftijd?k.leeftijd+' jaar':'')+' '+(k.beroep?'· '+esc(k.beroep):'')+' '+(k.gender?'· '+k.gender:'')+(k.achtergrond?' · '+esc(k.achtergrond):'')+'</div>';
+        } else {
+            html+='<div class="k-name">'+esc(k.naam)+'</div>';
+        }
+        html+='<div class="k-tags">';
+        if(k.archetype)html+='<span class="k-tag k-tag-arch">'+esc(k.archetype)+'</span>';
+        html+='<span class="k-tag k-tag-stage">'+SN[k.stage]+'</span>';
+        html+='</div></div></div>';
+
+        // Details
+        if(opt.score&&sc){
+            html+='<div class="k-details">';
+            html+='<div class="k-detail"><span class="k-detail-label">TV Score</span><span class="k-detail-val">'+sc.tv+'/40</span></div>';
+            html+='<div class="k-detail"><span class="k-detail-label">Uniekheid</span><span class="k-detail-val">'+sc.uniek+'/30</span></div>';
+            html+='<div class="k-detail"><span class="k-detail-label">Social</span><span class="k-detail-val">'+sc.social+'/30</span></div>';
+            html+='</div>';
+        }
+        if(opt.social){
+            if(k.insta||k.tiktok){html+='<div class="k-details">';
+            if(k.insta)html+='<div class="k-detail"><span class="k-detail-label">Instagram</span><span class="k-detail-val">'+esc(k.insta)+'</span></div>';
+            if(k.tiktok)html+='<div class="k-detail"><span class="k-detail-label">TikTok</span><span class="k-detail-val">'+esc(k.tiktok)+'</span></div>';
+            html+='</div>';}
+        }
+        if(opt.video&&k.video)html+='<div style="font-size:11px;margin:6px 0"><span style="color:#999">🎥 Video:</span> <a href="'+esc(k.video)+'" style="color:#7c5cfc">'+esc(k.video)+'</a></div>';
+        if(opt.desc&&k.desc)html+='<div class="k-desc">'+esc(k.desc)+'</div>';
+        if(opt.big5&&k.big5){
+            const traits=[{l:'Openheid',v:k.big5.openness,c:'#7c5cfc'},{l:'Zorgvuldig',v:k.big5.conscientiousness,c:'#22c55e'},{l:'Extraversie',v:k.big5.extraversion,c:'#eab308'},{l:'Meegaand',v:k.big5.agreeableness,c:'#3b82f6'},{l:'Neurotic.',v:k.big5.neuroticism,c:'#ef4444'}];
+            html+='<div class="b5-grid">';
+            traits.forEach(t=>{html+='<div class="b5-item"><div class="b5-ring" style="border:3px solid '+t.c+';color:'+t.c+'">'+t.v+'</div><div class="b5-name">'+t.l+'</div></div>';});
+            html+='</div>';
+        }
+        if(opt.eq&&k.eqAnswers&&k.eqAnswers.length){
+            html+='<div style="margin:10px 0;font-size:11px;color:#666"><strong style="color:#333">EQ Test:</strong><br>';
+            k.eqAnswers.forEach((a,i)=>{if(a&&EQ_QS[i])html+='<span style="color:#999">'+EQ_QS[i].q.substring(0,40)+'…</span> <strong>'+esc(a)+'</strong><br>';});
+            html+='</div>';
+        }
+        if(opt.notes&&k.notes&&k.notes.length){
+            html+='<div class="k-notes"><div class="k-notes-title">📝 Team Notities ('+k.notes.length+')</div>';
+            k.notes.forEach(n=>{html+='<div class="k-note-item"><strong>'+esc(n.author||'Team')+'</strong> <span style="color:#999">'+esc(n.date||'')+'</span><br>'+esc(n.text)+'</div>';});
+            html+='</div>';
+        }
+        if(opt.history&&k.history&&k.history.length){
+            html+='<div class="k-history">📋 Traject: ';
+            k.history.forEach(h=>{html+='<span>'+SN[h.from]+'</span> → <span>'+SN[h.to]+'</span> ('+esc(h.date)+') ';});
+            html+='</div>';
+        }
+        html+='</div>';
+    });
+
+    html+='<div class="confidential">VERTROUWELIJK — Dit rapport is gegenereerd door CastMatch Pro (FS Productions) en is uitsluitend bedoeld voor de casting director en producent.<br>'+today+'</div>';
+    html+='</div></body></html>';
+
+    if(format==='word'){
+        // Word export via HTML blob
+        const wordHtml='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]--><style>'+css+'</style></head><body>'+html.replace(/<html[^>]*>.*?<body>/s,'').replace(/<\/body><\/html>/,'')+'</body></html>';
+        const blob=new Blob(['\ufeff'+wordHtml],{type:'application/msword'});
+        dl(blob,'CastMatch-Rapport-'+S.showType.replace(/\s/g,'-')+'-'+Date.now()+'.doc');
+        toast('📝 Word rapport gedownload','ok');
+    } else {
+        const w=window.open('','_blank');
+        if(!w){alert('Popup geblokkeerd! Sta popups toe.');return;}
+        w.document.write(html);w.document.close();
+        setTimeout(()=>w.print(),300);
+        toast('📄 PDF rapport gegenereerd','ok');
+    }
+}
+function exportAll(){dl(new Blob([JSON.stringify({version:'3.1',app:'CastMatch Pro v3',date:new Date().toISOString(),project:projects.find(p=>p.id===currentProject)||{},showType:S.showType,kandidaten:S.kandidaten,chatHistory:chatHistory,analyses:S.analyses},null,2)],{type:'application/json'}),'castmatch-v3-'+Date.now()+'.json');}
+function exportText(t,name){dl(new Blob([t||''],{type:'text/plain;charset=utf-8'}),'castmatch-'+(name||'export')+'-'+Date.now()+'.txt');}
+function dl(b,n){const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;a.click();URL.revokeObjectURL(u);}
+function importAll(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.kandidaten&&confirm(d.kandidaten.length+' kandidaten importeren?')){let counter=0;S.kandidaten=[...S.kandidaten,...d.kandidaten.map(k=>({...k,id:Date.now()+(++counter),stage:k.stage||'intake'}))];if(d.showType)S.showType=d.showType;if(d.chatHistory&&Array.isArray(d.chatHistory)){chatHistory=[...chatHistory,...d.chatHistory];localStorage.setItem('cm3_chat_'+currentProject,JSON.stringify(chatHistory));}save();initShowChips();updateAll();alert('✅ Geïmporteerd! '+(d.chatHistory?'Chat history ook hersteld.':''));}}catch(err){alert('Fout: '+err.message);}};r.readAsText(f);e.target.value='';}
+function clearAll(){if(!confirm('ALLE data wissen?'))return;S.kandidaten=[];S.selected.clear();S.analyses=0;save();updateAll();el('analyseOut').innerHTML='';el('matrixOut').innerHTML='';el('compOut').innerHTML='';el('scenarioOut').innerHTML='';}
+
+// ── Keyboard ──
+let undoStack=[];
+function pushUndo(){if(undoStack.length>20)undoStack.shift();undoStack.push(JSON.stringify(S.kandidaten));}
+document.addEventListener('keydown',e=>{
+    if(e.key==='Escape')closeModal();
+    // Shortcuts (niet als focus in input/textarea)
+    const tag=document.activeElement?.tagName;if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+    if(e.key==='n'||e.key==='N'){e.preventDefault();showTab('kandidaten');setTimeout(()=>el('fNaam')?.focus(),100);}
+    if(e.key==='a'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();selectAllK();}
+    if((e.key==='z'||e.key==='Z')&&(e.ctrlKey||e.metaKey)){e.preventDefault();undoAction();}
+    if(e.key==='?'){e.preventDefault();toggleKBHint();}
+    if(e.key>='1'&&e.key<='9'){const tabs=['pipeline','kandidaten','analyse','matrix','diversiteit','vergelijk','scenario','showdna','eqtest'];const idx=parseInt(e.key)-1;if(tabs[idx])showTab(tabs[idx]);}
+});
+if(window.location.search.includes('eq=1')){showTab('eqtest');setTimeout(()=>showEQTest(),500);}
+
+// Feature 6: Undo
+function undoAction(){
+    if(!undoStack.length)return toast('Niets om ongedaan te maken','warn');
+    S.kandidaten=JSON.parse(undoStack.pop());save();updateAll();toast('↩️ Ongedaan gemaakt','ok');
+}
+
+// Feature 1: Duplicatie detectie
+function checkDuplicate(naam){
+    const norm=naam.toLowerCase().trim();
+    return S.kandidaten.find(k=>k.naam.toLowerCase().trim()===norm);
+}
+
+// Feature 2: Sorteer
+function sortKandidaten(list){
+    const s=el('sortBy')?el('sortBy').value:'';
+    if(!s)return list;
+    const copy=[...list];
+    switch(s){
+        case 'naam':return copy.sort((a,b)=>a.naam.localeCompare(b.naam));
+        case 'naam-desc':return copy.sort((a,b)=>b.naam.localeCompare(a.naam));
+        case 'leeftijd':return copy.sort((a,b)=>(parseInt(a.leeftijd)||0)-(parseInt(b.leeftijd)||0));
+        case 'leeftijd-desc':return copy.sort((a,b)=>(parseInt(b.leeftijd)||0)-(parseInt(a.leeftijd)||0));
+        case 'score':return copy.sort((a,b)=>((a.castScore?.total)||0)-((b.castScore?.total)||0));
+        case 'score-desc':return copy.sort((a,b)=>((b.castScore?.total)||0)-((a.castScore?.total)||0));
+        case 'recent':return copy.sort((a,b)=>b.id-a.id);
+        default:return copy;
+    }
+}
+
+// Feature 3: Theme toggle
+function toggleTheme(){
+    const isLight=document.body.classList.toggle('light');
+    localStorage.setItem('cm3_theme',isLight?'light':'dark');
+    el('themeBtn').textContent=isLight?'☀️':'🌙';
+}
+(function initTheme(){const t=localStorage.getItem('cm3_theme');if(t==='light'){document.body.classList.add('light');el('themeBtn').textContent='☀️';}})();
+
+// Feature 4: Kopieer naar project
+function copyToProject(){
+    const sel=getSelected();
+    if(!sel.length)return toast('Selecteer kandidaten om te kopiëren','warn');
+    const others=projects.filter(p=>p.id!==currentProject);
+    if(!others.length)return toast('Maak eerst een ander project aan','warn');
+    el('mTitle').textContent='📋 Kopieer '+sel.length+' kandidaten naar...';
+    el('mBody').innerHTML=others.map(p=>'<button class="btn btn-g" style="margin:4px;width:100%" onclick="doCopyToProject(\''+p.id+'\')">'+esc(p.name)+'</button>').join('');
+    el('modalBg').style.display='flex';
+}
+function doCopyToProject(targetId){
+    const sel=getSelected();if(!sel.length)return;
+    const d=JSON.parse(localStorage.getItem('cm3_'+targetId)||'{}');
+    const existing=d.k||[];let counter=0;
+    const copies=sel.map(k=>({...k,id:Date.now()+(++counter),history:[]}));
+    d.k=[...existing,...copies];
+    localStorage.setItem('cm3_'+targetId,JSON.stringify(d));
+    closeModal();toast('✅ '+sel.length+' kandidaten gekopieerd!','ok');
+}
+
+// ── Deep Search / Due Diligence ──
+async function deepSearch(id){
+    const k=S.kandidaten.find(x=>x.id===id);if(!k)return;
+    if(!getKey())return toast('Stel je API key in','warn');
+    el('mTitle').textContent='🔍 Deep Search — '+k.naam;
+    el('mBody').innerHTML='<div class="ld"><div class="sp"></div>Due diligence uitvoeren op '+esc(k.naam)+'...</div>';
+    el('modalBg').style.display='flex';
+    try{
+    const r=await callAI('Voer een uitgebreide due diligence / deep search uit op deze kandidaat voor "'+S.showType+'":\n\n'+kInfo(k)+'\n'+(k.insta?'Instagram: '+k.insta+'\n':'')+(k.tiktok?'TikTok: '+k.tiktok+'\n':'')+(k.video?'Video: '+k.video+'\n':'')+'\n\nAnalyseer als een ervaren casting researcher. Geef:\n\n### 🔍 ACHTERGROND SCREENING\nWat valt op aan dit profiel? Wat zou een background check opleveren? Welke vragen moet je stellen?\n\n### ⚠️ RODE VLAGGEN\nPotentiële risico\'s voor de productie: controversieel verleden, persoonlijkheidsrisico\'s, mogelijke PR-problemen, juridische risico\'s\n\n### 📱 SOCIAL MEDIA ANALYSE\nWat vertelt hun online aanwezigheid (of gebrek daaraan)? Inschatting bereik, engagement, doelgroep, authenticiteit\n\n### 🎭 MEDIATRAINING NODIG?\nHoe camera-ready is deze persoon? Wat moet getraind worden?\n\n### 🤝 REFERENTIE VRAGEN\nWelke 5 specifieke vragen zou je stellen aan hun referenties?\n\n### 💡 VERBORGEN POTENTIEEL\nWat zou deze persoon uniek maken dat niet direct zichtbaar is?\n\n### ✅ EINDOORDEEL\nGeschiktheid score 1-10 met onderbouwing. Go / No-Go / Nader Onderzoek aanbeveling.',SYS_NL);
+    if(!r){closeModal();return;}
+    // Sla deep search op als notitie
+    if(!Array.isArray(k.notes))k.notes=[];
+    k.notes.push({author:'AI Deep Search',text:'Due diligence uitgevoerd op '+new Date().toLocaleDateString('nl-NL'),date:new Date().toISOString()});
+    save();
+    el('mBody').innerHTML='<div class="result-box" style="max-height:65vh;overflow-y:auto">'+fmt(r)+'</div><div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-g btn-s" onclick="exportText(document.querySelector(\'#mBody .result-box\').innerText,\'deepsearch-'+esc(k.naam).replace(/\s+/g,'-')+'\')">📥 Export</button><button class="btn btn-g btn-s" onclick="saveDeepSearchNote('+id+')">💾 Opslaan als Notitie</button></div>';
+    S.analyses++;save();updateAll();
+    }catch(e){el('mBody').innerHTML='<p style="color:var(--red)">❌ '+e.message+'</p>';}
+}
+
+function saveDeepSearchNote(id){
+    const k=S.kandidaten.find(x=>x.id===id);if(!k)return;
+    const resultBox=document.querySelector('#mBody .result-box');if(!resultBox)return;
+    if(!Array.isArray(k.notes))k.notes=[];
+    k.notes.push({author:'AI Deep Search',text:resultBox.innerText.substring(0,500)+'...',date:new Date().toISOString()});
+    save();toast('💾 Deep Search opgeslagen als notitie','ok');
+}
+
+// Feature 5: AI Cast Optimizer
+async function aiOptimizeCast(){
+    if(!S.kandidaten.length)return toast('Voeg eerst kandidaten toe','warn');
+    if(S.kandidaten.length<4)return toast('Minimaal 4 kandidaten nodig','warn');
+    if(!getKey())return toast('Stel je API key in','warn');
+    el('mTitle').textContent='🎯 AI Cast Optimizer';
+    el('mBody').innerHTML='<div class="ld"><div class="sp"></div>Ideale cast samenstellen...</div>';
+    el('modalBg').style.display='flex';
+    const dna=SHOW_DNA[S.showType];const dnaStr=dna?'\n\nShow DNA voor '+S.showType+': '+JSON.stringify(dna):'';
+    try{
+    const r=await callAI('Stel de IDEALE CAST samen voor "'+S.showType+'" uit deze pool:\n\n'+S.kandidaten.map((k,i)=>(i+1)+'. '+kInfo(k)).join('\n\n')+dnaStr+'\n\nKies de beste combinatie van kandidaten (8-12). Leg uit:\n### GESELECTEERDE CAST (nummers + namen)\n### WAAROM DEZE COMBINATIE\n### VERWACHTE GROEPSDYNAMIEK\n### WAT MAAKT DEZE CAST TV-GOUD\n### RISICO\'S & MITIGATIE',SYS_NL);
+    if(!r){closeModal();return;}
+    el('mBody').innerHTML='<div class="result-box" style="max-height:60vh;overflow-y:auto">'+fmt(r)+'</div>';S.analyses++;save();
+    }catch(e){el('mBody').innerHTML='<p style="color:var(--red)">❌ '+e.message+'</p>';}
+}
+
+// Feature 7: Foto van URL
+function previewFotoUrl(url){
+    if(!url||!url.match(/^https?:\/\//i)){pendingPhoto=null;return;}
+    const img=new Image();img.crossOrigin='anonymous';
+    img.onload=()=>{try{const c=document.createElement('canvas'),sz=120;c.width=sz;c.height=sz;const ctx=c.getContext('2d'),mn=Math.min(img.width,img.height);ctx.drawImage(img,(img.width-mn)/2,(img.height-mn)/2,mn,mn,0,0,sz,sz);pendingPhoto=c.toDataURL('image/jpeg',0.7);el('fotoPreview').innerHTML='<img src="'+pendingPhoto+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover">';}catch(e){pendingPhoto=url;el('fotoPreview').innerHTML='<img src="'+esc(url)+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover">';}};
+    img.onerror=()=>{pendingPhoto=url;el('fotoPreview').innerHTML='<img src="'+esc(url)+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover" onerror="this.style.display=\'none\'">';};
+    img.src=url;
+}
+
+// Feature 8: localStorage waarschuwing
+function checkStorage(){
+    try{
+        let total=0;for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('cm3_'))total+=localStorage.getItem(k).length;}
+        const mb=(total/1024/1024).toFixed(1);const pct=Math.round(total/5242880*100);
+        if(pct>70){el('storageWarn').style.display='block';el('storageWarn').textContent='💾 '+mb+'MB/5MB ('+ pct+'%)'+(pct>90?' ⚠️ Bijna vol!':'');
+        el('storageWarn').style.color=pct>90?'var(--red)':'var(--amber)';}
+        else{el('storageWarn').style.display='none';}
+    }catch(e){}
+}
+
+// Feature 9: Toast notificaties
+function toast(msg,type){
+    const t=document.createElement('div');t.className='toast toast-'+(type||'ok');t.textContent=msg;
+    document.body.appendChild(t);setTimeout(()=>t.remove(),3200);
+}
+
+// Feature 9: Keyboard hint
+function toggleKBHint(){
+    let h=document.getElementById('kbHint');
+    if(h){h.style.display=h.style.display==='none'?'block':'none';return;}
+    h=document.createElement('div');h.className='kb-hint';h.id='kbHint';
+    h.innerHTML='<strong>Sneltoetsen</strong><br><kbd>N</kbd> Nieuwe kandidaat · <kbd>A</kbd> Alles selecteren<br><kbd>1</kbd>-<kbd>9</kbd> Wissel tab · <kbd>Ctrl+Z</kbd> Undo<br><kbd>Esc</kbd> Modal sluiten · <kbd>?</kbd> Deze help';
+    h.style.display='block';document.body.appendChild(h);
+}
+
+// FAQ / Help overlay
+function showFAQ(){
+    el('mTitle').textContent='❓ Help & FAQ';
+    el('mBody').innerHTML=`
+<div style="font-size:12px;line-height:1.7;color:var(--text)">
+<div style="font-weight:700;font-size:14px;margin-bottom:12px">Hoe werkt CastMatch Pro?</div>
+<p style="margin-bottom:12px;color:var(--text-dim)">CastMatch is een AI-gestuurde casting tool voor reality TV. Hieronder vind je uitleg per sectie.</p>
+
+<div style="border-left:3px solid var(--accent);padding-left:12px;margin-bottom:14px">
+<strong>📊 Pipeline</strong><br>
+Het casting proces in 6 fases: Intake → Screening → Interview → Shortlist → Pitched → Gecast. Sleep kandidaten of gebruik de ◀ ▶ knoppen om ze door het proces te bewegen.
+</div>
+
+<div style="border-left:3px solid var(--green);padding-left:12px;margin-bottom:14px">
+<strong>👥 Kandidaten</strong><br>
+Hier voeg je kandidaten toe en beheer je ze. Vul minimaal naam + beschrijving in. Selecteer kandidaten met het ✓ vakje voor AI functies. <em>Tip: Gebruik "Bulk Analyse" om alle kandidaten in één keer te analyseren.</em>
+</div>
+
+<div style="border-left:3px solid var(--amber);padding-left:12px;margin-bottom:14px">
+<strong>🤖 AI Analyse & AI Profiel</strong><br>
+AI Profiel genereert per kandidaat: Big Five persoonlijkheidsscores, casting score en gedragsanalyse. <strong>Zonder AI Profiel zijn scores en balkjes leeg.</strong> Groepsanalyse analyseert de dynamiek tussen geselecteerde kandidaten.
+</div>
+
+<div style="border-left:3px solid var(--blue);padding-left:12px;margin-bottom:14px">
+<strong>🔗 Relatie Matrix</strong><br>
+AI genereert conflict- en compatibiliteitsscores tussen alle geselecteerde kandidaten. Selecteer min. 3 kandidaten en klik "Genereer Matrix". Vereist: min. 3 geselecteerde kandidaten.
+</div>
+
+<div style="border-left:3px solid var(--cyan);padding-left:12px;margin-bottom:14px">
+<strong>📊 Diversiteit</strong><br>
+Automatisch dashboard met gender-, leeftijds-, archetype- en achtergrondverdeling. Wordt automatisch gevuld zodra je kandidaten toevoegt.
+</div>
+
+<div style="border-left:3px solid var(--amber);padding-left:12px;margin-bottom:14px">
+<strong>⚖️ Vergelijk</strong><br>
+Zij-aan-zij vergelijking van 2-3 kandidaten met foto, scores en Big Five balkjes. <strong>Lege kaarten?</strong> Draai eerst een AI Profiel op die kandidaat via de Analyseer knop.
+</div>
+
+<div style="border-left:3px solid var(--red);padding-left:12px;margin-bottom:14px">
+<strong>🎭 Scenario</strong><br>
+Beschrijf een situatie (bijv. "iemand moet verbannen") en AI voorspelt hoe elke geselecteerde kandidaat reageert. Gebruik de templates of schrijf je eigen scenario.
+</div>
+
+<div style="border-left:3px solid var(--cyan);padding-left:12px;margin-bottom:14px">
+<strong>🧬 Show DNA</strong><br>
+Toont de ideale archetype-verdeling per programma. <strong>Alles op 0?</strong> Dat betekent dat je kandidaten nog geen archetype hebben of niet in Shortlist/Pitched/Gecast staan. Verplaats ze eerst door de pipeline.
+</div>
+
+<div style="border-left:3px solid var(--pink);padding-left:12px;margin-bottom:14px">
+<strong>🧠 EQ Test</strong><br>
+10-vragen persoonlijkheidstest. Kies een kandidaat en vul de test in. Resultaten worden gekoppeld aan het profiel.
+</div>
+
+<div style="border-left:3px solid var(--accent);padding-left:12px;margin-bottom:14px">
+<strong>💬 AI Chat</strong><br>
+Vrije vraag-antwoord over je kandidatenpool. Stel vragen als "Wie past het beste als mol?" of "Welke kandidaat is het grootste risico?". De AI kent alle kandidaten in je project.
+</div>
+
+<div style="border-left:3px solid var(--text-muted);padding-left:12px;margin-bottom:14px">
+<strong>⚙️ Settings</strong><br>
+Stel je Claude API key in (nodig voor alle AI functies), kies een model, en import/export je data als JSON backup.
+</div>
+
+<div style="margin-top:16px;padding:12px;background:var(--surface-2);border-radius:8px">
+<strong>⌨️ Sneltoetsen</strong><br>
+<kbd>N</kbd> Nieuwe kandidaat · <kbd>A</kbd> Alles selecteren · <kbd>1</kbd>-<kbd>9</kbd> Wissel tab<br>
+<kbd>Ctrl+Z</kbd> Undo · <kbd>Esc</kbd> Modal sluiten · <kbd>?</kbd> Help
+</div>
+</div>`;
+    el('modalBg').style.display='flex';
+}
+
+// Feature 10: Visuele vergelijking
+function renderVisualCompare(){
+    const sel=getSelected();const out=el('compVisual');if(!out)return;
+    if(sel.length<2||sel.length>3){out.innerHTML='';return;}
+    let h='<div class="vcomp-grid c'+sel.length+'">';
+    sel.forEach(k=>{
+        const sc=k.castScore||calcScore(k);
+        h+='<div class="vcomp-card">';
+        if(k.photo)h+='<img src="'+k.photo+'">';
+        h+='<div class="vname">'+esc(k.naam)+'</div>';
+        h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:8px">'+(k.leeftijd?k.leeftijd+'j':'')+' '+(k.beroep?'· '+esc(k.beroep):'')+'</div>';
+        if(k.archetype)h+='<span class="tag tag-a" style="margin-bottom:8px;display:inline-block">'+esc(k.archetype)+'</span>';
+        if(sc)h+='<div class="score-ring '+(sc.total>=70?'high':sc.total>=40?'mid':'low')+'" style="margin:8px auto">'+sc.total+'</div>';
+        if(k.big5){
+            const traits=[{l:'O',v:k.big5.openness,c:'var(--accent)'},{l:'C',v:k.big5.conscientiousness,c:'var(--green)'},{l:'E',v:k.big5.extraversion,c:'var(--amber)'},{l:'A',v:k.big5.agreeableness,c:'var(--blue)'},{l:'N',v:k.big5.neuroticism,c:'var(--red)'}];
+            h+='<div style="margin-top:8px">'+traits.map(t=>'<div style="display:flex;align-items:center;gap:4px;margin:2px 0"><span style="font-size:10px;font-family:var(--mono);width:14px;color:var(--text-dim)">'+t.l+'</span><div style="flex:1;height:8px;background:var(--surface-3);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+t.v+'%;background:'+t.c+';border-radius:2px"></div></div><span style="font-size:9px;font-family:var(--mono);width:22px;text-align:right;color:var(--text-dim)">'+t.v+'</span></div>').join('')+'</div>';
+        } else {
+            h+='<div style="margin-top:12px;text-align:center;padding:12px;border:1px dashed var(--border);border-radius:8px;background:var(--surface-2)">';
+            h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Nog geen AI analyse</div>';
+            h+='<button onclick="aiProfile('+k.id+').then(()=>renderVisualCompare())" style="font-size:11px;padding:5px 14px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">🤖 Analyseer</button>';
+            h+='</div>';
+        }
+        h+='</div>';
+    });
+    h+='</div>';out.innerHTML=h;
+}
+</script>
+</body>
+</html>
